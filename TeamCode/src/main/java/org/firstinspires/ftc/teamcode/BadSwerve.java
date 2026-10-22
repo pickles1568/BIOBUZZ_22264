@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.revhub.localizers.Encoder;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 
@@ -20,9 +22,15 @@ public class BadSwerve extends OpMode {
     DcMotor intake;
     DcMotor turret;
 
+    AnalogInput rbTurnEncoder;
+    AnalogInput lfTurnEncoder;
+    AnalogInput rfTurnEncoder;
+    AnalogInput lbTurnEncoder;
+
+
     @Override
     public void init() {
-        // Map motors using configuration names matching your variables
+        // Map motors using configuration names
         rb = hardwareMap.get(DcMotor.class, "rb");
         lf = hardwareMap.get(DcMotor.class, "lf");
         rf = hardwareMap.get(DcMotor.class, "rf");
@@ -37,11 +45,16 @@ public class BadSwerve extends OpMode {
         lfTurn = hardwareMap.get(CRServo.class, "lfTurn");
         rfTurn = hardwareMap.get(CRServo.class, "rfTurn");
         lbTurn = hardwareMap.get(CRServo.class, "lbTurn");
+
+        rbTurnEncoder = hardwareMap.get(AnalogInput.class, "rbTurnEncoder");
+        lfTurnEncoder = hardwareMap.get(AnalogInput.class, "lfTurnEncoder");
+        rfTurnEncoder = hardwareMap.get(AnalogInput.class, "rfTurnEncoder");
+        lbTurnEncoder = hardwareMap.get(AnalogInput.class, "lbTurnEncoder");
     }
 
     @Override
     public void loop() {
-        // Continuous rotation servos use setPower(-1.0 to 1.0) instead of setPosition()
+        // Continuous rotation servos use setPower(-1.0 to 1.0)
         double turnPower = gamepad1.left_stick_x;
 
         rbTurn.setPower(turnPower);
@@ -59,5 +72,12 @@ public class BadSwerve extends OpMode {
 
         intake.setPower(gamepad2.left_stick_y);
         turret.setPower(gamepad2.right_stick_y);
+
+        telemetry.addData("rbTurnEncoder: ", rbTurnEncoder.getVoltage());
+        telemetry.addData("lfTurnEncoder: ", lfTurnEncoder.getVoltage());
+        telemetry.addData("rfTurnEncoder: ", rfTurnEncoder.getVoltage());
+        telemetry.addData("lbTurnEncoder: ", lbTurnEncoder.getVoltage());
+
+        telemetry.update();
     }
 }

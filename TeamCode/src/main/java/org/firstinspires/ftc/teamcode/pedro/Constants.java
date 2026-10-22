@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.pedro;
 
 import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Vector2D;
 import com.pedropathing.revhub.drivetrains.CoaxialPodConfig;
 import com.pedropathing.revhub.drivetrains.SwerveConfig;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -12,6 +13,10 @@ public class Constants {
         // return new Follower(Drivetrain, Localizer, Foresight);
         return null;
     }
+
+    //DT Defintions
+    static double dtWidth = 438.35;
+    static double dtlength = 402.00;
 
     public static SwerveConfig driveConfig = new SwerveConfig(
             c -> {
@@ -31,6 +36,14 @@ public class Constants {
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.analogMinVoltage.set(0.018);
+                c.analogMaxVoltage.set(3.19);
+
+                c.angleOffsetRad.set(4.143);
+                c.podOffset.set(Vector2D.cartesian(-dtlength, dtWidth));
+                c.encoderReversed.set(Boolean.TRUE);
+
+
             }
     );
 
@@ -44,6 +57,12 @@ public class Constants {
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.analogMinVoltage.set(0.019);
+                c.analogMaxVoltage.set(3.21);
+
+                c.angleOffsetRad.set(0.935);
+                c.podOffset.set(Vector2D.cartesian(dtlength, dtWidth));
+                c.encoderReversed.set(Boolean.TRUE);
             }
     );
 
@@ -57,6 +76,12 @@ public class Constants {
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.analogMinVoltage.set(0.014);
+                c.analogMaxVoltage.set(3.164);
+
+                c.angleOffsetRad.set(4.135);
+                c.podOffset.set(Vector2D.cartesian(dtlength, -dtWidth));
+                c.encoderReversed.set(Boolean.TRUE);
             }
     );
 
@@ -70,6 +95,12 @@ public class Constants {
                         .plus(Controller.proportionalFeedforward(0)));
                 c.driveDirection.set(DcMotorSimple.Direction.FORWARD);
                 c.servoDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.analogMinVoltage.set(0.017);
+                c.analogMaxVoltage.set(3.178);
+
+                c.angleOffsetRad.set(2.914);
+                c.podOffset.set(Vector2D.cartesian(-dtlength, dtWidth));
+                c.encoderReversed.set(Boolean.TRUE);
             }
     );
 

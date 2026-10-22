@@ -14,8 +14,8 @@ public class Turret {
     double lastEncoderPosition;
     long lastTimeNano;
 
-    public double highVel = 4000;
-    public double lowVel = 1200;
+    public double highVel = 2500;
+    public double lowVel = 1500;
 
     // Made public so the tuner OpMode can display them in telemetry
     public double curTargetVel = highVel;

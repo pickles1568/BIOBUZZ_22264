@@ -10,11 +10,9 @@ public class TurretPIDFTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // Initialize hardware map name (make sure "flywheel" matches your robot config)
         DcMotorEx flywheelMotor = hardwareMap.get(DcMotorEx.class, "turret");
         Turret turret = new Turret(flywheelMotor);
 
-        // Previous button states for debouncing single presses
         boolean dpadUpPrev = false;
         boolean dpadDownPrev = false;
         boolean dpadLeftPrev = false;
@@ -36,7 +34,6 @@ public class TurretPIDFTuner extends LinearOpMode {
             boolean xButton = gamepad1.x;
             boolean aButton = gamepad1.a;
 
-            // --- Control Mappings ---
             // Dpad Up / Down: Tune P coefficient
             if (dpadUp && !dpadUpPrev) {
                 turret.tuneP(1);
