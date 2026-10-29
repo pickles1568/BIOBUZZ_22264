@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.pedropathing.ivy.commands.Commands.conditional;
+import static com.pedropathing.ivy.commands.Commands.instant;
+
+import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -7,14 +11,14 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class Turret {
 
     final double encoderResolutionTPR = 28.0;
-    final double MaxRPM = 1150;
+    final double MaxRPM = 6000;
 
     DcMotorEx Flywheel;
 
     double lastEncoderPosition;
     long lastTimeNano;
 
-    public double highVel = 2500;
+    public double highVel = 5500;
     public double lowVel = 1500;
 
     // Made public so the tuner OpMode can display them in telemetry
@@ -56,6 +60,8 @@ public class Turret {
         P += stepSizes[stepIndex] * mult;
     }
 
+    public void tuneHigh(int mult){highVel += stepSizes[stepIndex] * mult;}
+
     public void updateTune(){
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0.0, 0.0, F);
         Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
@@ -93,4 +99,45 @@ public class Turret {
     public double getEncoder() {
         return Flywheel.getCurrentPosition();
     }
+
+    double CurVel;
+    double Error;
+    double tolerence = 50;
+
+    public Command DoFlywheel = Command.build()
+            .setStart(() -> {
+                curTargetVel = highVel;
+                updateVel();
+            })
+            .setExecute(() -> {
+                CurVel = Flywheel.getVelocity();
+                Error = curTargetVel - CurVel;
+                updateVel();
+            })
+            .setDone(() -> {
+                return Error <= tolerence;
+            })
+            .requiring(Flywheel);
+
+    public Command RunFlywheel = Command.build()
+            .setStart(() -> {
+                curTargetVel = highVel;
+            })
+            .setExecute(() -> {
+                updateVel();
+            })
+            .setDone(() -> false) // Runs continuously until interrupted/stopped
+            .requiring(Flywheel);
+
+    public Command StopFlywheel = instant(() -> {
+        curTargetVel = 0;
+        Flywheel.setVelocity(0);
+        Flywheel.setPower(0);
+    });
+
+    public Command ToggleFlywheel = conditional(
+            () -> DoFlywheel.isScheduled(),
+            StopFlywheel,
+            DoFlywheel
+    );
 }

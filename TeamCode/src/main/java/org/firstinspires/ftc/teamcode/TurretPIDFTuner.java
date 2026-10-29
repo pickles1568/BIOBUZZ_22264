@@ -19,6 +19,8 @@ public class TurretPIDFTuner extends LinearOpMode {
         boolean dpadRightPrev = false;
         boolean xPrev = false;
         boolean aPrev = false;
+        boolean lsPev =false;
+        boolean rsPev =false;
 
         telemetry.addData("Status", "Initialized. Ready to tune!");
         telemetry.update();
@@ -51,6 +53,17 @@ public class TurretPIDFTuner extends LinearOpMode {
                 turret.tuneF(-1);
                 turret.updateTune();
             }
+
+            if (gamepad1.left_bumper && !lsPev) {
+                turret.tuneHigh(1);
+                turret.updateTune();
+            } else if (gamepad1.right_bumper && !rsPev) {
+                turret.tuneHigh(-1);
+                turret.updateTune();
+            }
+            rsPev = gamepad1.right_bumper;
+            lsPev = gamepad1.left_bumper;
+
 
             // X Button: Cycle through step increments (10, 1, 0.1, 0.001, etc.)
             if (xButton && !xPrev) {
@@ -85,6 +98,7 @@ public class TurretPIDFTuner extends LinearOpMode {
             telemetry.addData("Actual Velocity (ticks/s)", telemData[0]);
             telemetry.addData("Error (Target - Actual)", telemData[1]);
             telemetry.addData("Calculated RPM", turret.getRPM());
+            telemetry.addData("Target", turret.highVel);
             telemetry.update();
         }
     }
