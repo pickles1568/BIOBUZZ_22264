@@ -5,8 +5,11 @@ import  org.firstinspires.ftc.teamcode.subsystems.*; //All the subsystems
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
+
+import static com.pedropathing.ivy.Scheduler.isScheduled;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.conditional;
+import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
@@ -43,8 +46,7 @@ public class TeleopMain extends OpMode {
 
         PollenTurret = new Turret(hardwareMap.get(DcMotorEx.class, "PollenTurret"));
 
-        StopShooting = parallel( PollenTurret.StopFlywheel, IntakeManager.StopKicking);
-
+        StopShooting = parallel(PollenTurret.StopFlywheel, IntakeManager.StopKicking, instant(() -> {StartShooting.cancel();}));//Make sure its dead
         StartShooting = sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, IntakeManager.StartKicking));
 
         ToggleShooting = conditional(() -> StartShooting.isScheduled(),
@@ -55,19 +57,18 @@ public class TeleopMain extends OpMode {
 
     @Override
     public void loop() {
-        DrivePowers powers = ManualDrive.fieldCentric(
-                -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x,
-                follower.pose().heading()
-        );
-
-        ManualDrive.driveOrHold(follower, powers);
-        follower.update();
+//        DrivePowers powers = ManualDrive.fieldCentric(
+//                -gamepad1.left_stick_y,
+//                gamepad1.left_stick_x,
+//                gamepad1.right_stick_x,
+//                follower.pose().heading()
+//        );
+//
+//        ManualDrive.driveOrHold(follower, powers);
+//        follower.update();
 
         if(!HoldingA && gamepad1.a){schedule(IntakeManager.toggleIntakeMode);} HoldingA = gamepad1.a;
-        if(!HoldingB&& gamepad1.b){schedule(ToggleShooting);} HoldingB = gamepad1.b;
-
+        if(!HoldingB && gamepad1.b){schedule(ToggleShooting);} HoldingB = gamepad1.b;
 
         Scheduler.execute();
     }

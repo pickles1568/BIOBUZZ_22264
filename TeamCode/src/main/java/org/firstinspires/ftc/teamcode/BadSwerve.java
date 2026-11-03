@@ -38,7 +38,7 @@ public class BadSwerve extends OpMode {
 
         // Intake & turret motor
         intake = hardwareMap.get(DcMotor.class, "intake");
-        turret = hardwareMap.get(DcMotor.class, "turret");
+        turret = hardwareMap.get(DcMotor.class, "PollenTurret");
 
         // Map continuous rotation servos using CRServo.class
         rbTurn = hardwareMap.get(CRServo.class, "rbTurn");

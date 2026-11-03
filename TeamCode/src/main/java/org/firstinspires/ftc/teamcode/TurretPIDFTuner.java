@@ -10,7 +10,7 @@ public class TurretPIDFTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotorEx flywheelMotor = hardwareMap.get(DcMotorEx.class, "turret");
+        DcMotorEx flywheelMotor = hardwareMap.get(DcMotorEx.class, "PollenTurret");
         Turret turret = new Turret(flywheelMotor);
 
         boolean dpadUpPrev = false;

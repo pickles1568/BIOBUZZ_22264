@@ -22,7 +22,7 @@ public class IntakeTransferManager {
         Intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Transfer.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        Transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true;});
