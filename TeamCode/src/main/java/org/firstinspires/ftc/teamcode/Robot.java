@@ -28,7 +28,5 @@ public class Robot {
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
     }
 
-    public Robot(HardwareMap hwMap) {// If no boolean provoided assume true
-        this(hwMap, true);
-    }
+    public Robot(HardwareMap hwMap) {this(hwMap, true);}
 }

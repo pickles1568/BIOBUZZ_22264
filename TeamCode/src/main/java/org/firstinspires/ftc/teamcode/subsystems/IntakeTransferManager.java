@@ -17,7 +17,6 @@ public class IntakeTransferManager {
         this.Intake = Intake;
         this.Transfer = Transfer;
 
-
         Intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Transfer.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -26,8 +25,6 @@ public class IntakeTransferManager {
 
     Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true;}).requiring(Intake, Transfer);
     Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false;}).requiring(Intake, Transfer);
-
-
 
     Command ActivateTransfer = instant(() -> {Transfer.setPower(1);}).requiring(Transfer);
     Command StopTransfer = instant(() -> {Transfer.setPower(0);}).requiring(Transfer);
