@@ -1,17 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
+@Disabled
 @TeleOp(name = "Turret PIDF Tuner", group = "Tuning")
 public class TurretPIDFTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotorEx flywheelMotor = hardwareMap.get(DcMotorEx.class, "PollenTurret");
-        Turret turret = new Turret(flywheelMotor);
+        Turret turret = new Turret(flywheelMotor, hardwareMap.get(CRServo.class, "pollenKicker"));
 
         boolean dpadUpPrev = false;
         boolean dpadDownPrev = false;

@@ -11,13 +11,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 public class IntakeTransferManager {
     DcMotor Intake;
     DcMotor Transfer;
-    CRServo PollenKicker;
     Boolean Collecting = false;
 
-    public IntakeTransferManager(DcMotor Intake, DcMotor Transfer, CRServo PollenKicker) {
+    public IntakeTransferManager(DcMotor Intake, DcMotor Transfer) {
         this.Intake = Intake;
         this.Transfer = Transfer;
-        this.PollenKicker = PollenKicker;
+
 
         Intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Transfer.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -25,19 +24,18 @@ public class IntakeTransferManager {
         Transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true;});
-    Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false;});
+    Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true;}).requiring(Intake, Transfer);
+    Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false;}).requiring(Intake, Transfer);
 
-    public Command StartKicking = instant(() -> {PollenKicker.setPower(1);});
-    public Command StopKicking = instant(() -> {PollenKicker.setPower(0);});
 
-    Command ActivateTransfer = instant(() -> {Transfer.setPower(1);});
-    Command StopTransfer = instant(() -> {Transfer.setPower(0);});
+
+    Command ActivateTransfer = instant(() -> {Transfer.setPower(1);}).requiring(Transfer);
+    Command StopTransfer = instant(() -> {Transfer.setPower(0);}).requiring(Transfer);
 
     public Command toggleIntakeMode = conditional(
             () -> Collecting,
             StopCollecting,
             StartCollecting
-    );
+    ).requiring(Intake, Transfer);
 
 }

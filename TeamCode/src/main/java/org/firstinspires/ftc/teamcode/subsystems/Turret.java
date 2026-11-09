@@ -4,9 +4,12 @@ import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant;
 
 import com.pedropathing.ivy.Command;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.teamcode.helpers.Button;
 
 public class Turret {
 
@@ -14,6 +17,8 @@ public class Turret {
     final double MaxRPM = 6000;
 
     DcMotorEx Flywheel;
+
+    CRServo kicker;
 
     double lastEncoderPosition;
     long lastTimeNano;
@@ -29,8 +34,9 @@ public class Turret {
     public double[] stepSizes = {10.0, 1.0, 0.1, 0.001, 0.0001};
     public int stepIndex = 1;
 
-    public Turret(DcMotorEx Flywheel) {
+    public Turret(DcMotorEx Flywheel, CRServo kicker) {
         this.Flywheel = Flywheel;
+        this.kicker = kicker;
         lastEncoderPosition = Flywheel.getCurrentPosition();
         Flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -129,15 +135,53 @@ public class Turret {
             .setDone(() -> false) // Runs continuously until interrupted/stopped
             .requiring(Flywheel);
 
-    public Command StopFlywheel = instant(() -> {
-        curTargetVel = 0;
-        Flywheel.setVelocity(0);
-        Flywheel.setPower(0);
-    });
+    public Command StopFlywheel = Command.build()
+            .setStart(() -> {
+                curTargetVel = 0;
+                Flywheel.setVelocity(0);
+                Flywheel.setPower(0);
+            })
+            .setDone(() -> true)
+            .requiring(Flywheel);
 
     public Command ToggleFlywheel = conditional(
             () -> DoFlywheel.isScheduled(),
             StopFlywheel,
             DoFlywheel
     );
+
+    public Command StartKicking = instant(() -> {kicker.setPower(1);}).requiring(kicker);
+    public Command StopKicking = instant(() -> {kicker.setPower(0);}).requiring(kicker);
+
+    private final Button btnDpadUp = new Button(); private final Button btnDpadDown = new Button(); private final Button btnDpadLeft = new Button(); private final Button btnDpadRight = new Button(); private final Button btnX = new Button(); private final Button btnA = new Button(); private final Button btnLeftBumper = new Button(); private final Button btnRightBumper = new Button();
+    public void handleTuningInput(com.qualcomm.robotcore.hardware.Gamepad gamepad) {
+        if (btnDpadUp.wasJustPressed(gamepad.dpad_up))          { tuneP(1); updateTune(); }
+        if (btnDpadDown.wasJustPressed(gamepad.dpad_down))      { tuneP(-1); updateTune(); }
+        if (btnDpadRight.wasJustPressed(gamepad.dpad_right))    { tuneF(1); updateTune(); }
+        if (btnDpadLeft.wasJustPressed(gamepad.dpad_left))      { tuneF(-1); updateTune(); }
+        if (btnLeftBumper.wasJustPressed(gamepad.left_bumper))  { tuneHigh(1); updateTune(); }
+        if (btnRightBumper.wasJustPressed(gamepad.right_bumper)){ tuneHigh(-1); updateTune(); }
+        if (btnX.wasJustPressed(gamepad.x))                     { incrementStep(); }
+        if (btnA.wasJustPressed(gamepad.a))                     { spinUp(); }
+        if (gamepad.b)                                          { kicker.setPower(1);}else{ kicker.setPower(0);}
+
+        updateVel();
+    }
+    public void sendTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
+        double[] telemData = getTelemData();
+        telemetry.addData("Controls", "Dpad Up/Down: P | Dpad Right/Left: F");
+        telemetry.addData("Controls", "X: Change Step Size | A: Toggle Target Vel");
+        telemetry.addData("Controls", "Bumper Left/Right : Target Vel");
+        telemetry.addData("Controls", "B : Run Kicker");
+        telemetry.addLine("----------------------------------------");
+        telemetry.addData("Current Step Size", stepSizes[stepIndex]);
+        telemetry.addData("P Coefficient", P);
+        telemetry.addData("F Coefficient", F);
+        telemetry.addData("Target Velocity (ticks/s)", curTargetVel);
+        telemetry.addData("Actual Velocity (ticks/s)", telemData[0]);
+        telemetry.addData("Error (Target - Actual)", telemData[1]);
+        telemetry.addData("Calculated RPM", getRPM());
+        telemetry.addData("Target HighVel", highVel);
+        telemetry.update();
+    }
 }

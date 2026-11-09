@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.pedropathing.revhub.localizers.Encoder;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -8,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 @TeleOp
-public class BadSwerve extends OpMode {
+public class TestingScript extends OpMode {
     DcMotor rb;
     DcMotor lf;
     DcMotor rf;
@@ -26,6 +25,9 @@ public class BadSwerve extends OpMode {
     AnalogInput lfTurnEncoder;
     AnalogInput rfTurnEncoder;
     AnalogInput lbTurnEncoder;
+
+    DcMotor Transfer;
+    CRServo PollenKicker;
 
 
     @Override
@@ -50,6 +52,9 @@ public class BadSwerve extends OpMode {
         lfTurnEncoder = hardwareMap.get(AnalogInput.class, "lfTurnEncoder");
         rfTurnEncoder = hardwareMap.get(AnalogInput.class, "rfTurnEncoder");
         lbTurnEncoder = hardwareMap.get(AnalogInput.class, "lbTurnEncoder");
+
+        Transfer = hardwareMap.get(DcMotor.class, "transfer");
+        PollenKicker = hardwareMap.get(CRServo.class, "pollenKicker");
     }
 
     @Override
@@ -71,12 +76,37 @@ public class BadSwerve extends OpMode {
         lb.setPower(drivePower);
 
         intake.setPower(gamepad2.left_stick_y);
-        turret.setPower(gamepad2.right_stick_y);
+
 
         telemetry.addData("rbTurnEncoder: ", rbTurnEncoder.getVoltage());
         telemetry.addData("lfTurnEncoder: ", lfTurnEncoder.getVoltage());
         telemetry.addData("rfTurnEncoder: ", rfTurnEncoder.getVoltage());
         telemetry.addData("lbTurnEncoder: ", lbTurnEncoder.getVoltage());
+
+        if(gamepad2.a){
+            Transfer.setPower(-1);
+            telemetry.addLine("Transfer Running");
+        }else{
+            Transfer.setPower(0);
+            telemetry.addLine("(A) Run Transfer");
+        }
+
+        if(gamepad2.b) {
+            turret.setPower((gamepad2.right_stick_y + 1) * 0.5);
+            telemetry.addLine("[Right Stick] Shooter Running");
+        }else{
+            turret.setPower(0);
+            telemetry.addLine("(B) [Right Stick] Run Shooter");
+        }
+
+        if(gamepad2.x) {
+            PollenKicker.setPower(1);
+            telemetry.addLine("Kicker Running");
+        }else{
+            PollenKicker.setPower(0);
+            telemetry.addLine("(X) Run Kicker");
+        }
+
 
         telemetry.update();
     }

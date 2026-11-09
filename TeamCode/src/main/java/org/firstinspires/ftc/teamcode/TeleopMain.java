@@ -31,25 +31,28 @@ public class TeleopMain extends OpMode {
     private Follower follower;
 
     boolean HoldingA = false; boolean HoldingB = false;
-    IntakeTransferManager IntakeManager;
-    Turret PollenTurret;
+//    IntakeTransferManager IntakeManager;
+//    Turret PollenTurret;
     Command StartShooting; Command StopShooting; Command ToggleShooting;
 
+    Robot robot;
 
     @Override
     public void init() {
+        robot = new Robot(hardwareMap, true);
+
         follower = Constants.create(hardwareMap);
-        IntakeManager = new IntakeTransferManager(
-                hardwareMap.get(DcMotor.class, "intake"),
-                hardwareMap.get(DcMotor.class, "transfer"),
-                hardwareMap.get(CRServo.class, "pollenKicker"));
+//        IntakeManager = new IntakeTransferManager(
+//                hardwareMap.get(DcMotor.class, "intake"),
+//                hardwareMap.get(DcMotor.class, "transfer"),
+//                hardwareMap.get(CRServo.class, "pollenKicker"));
+//
+//        PollenTurret = new Turret(hardwareMap.get(DcMotorEx.class, "PollenTurret"));
 
-        PollenTurret = new Turret(hardwareMap.get(DcMotorEx.class, "PollenTurret"));
+        StopShooting = parallel(robot.PollenTurret.StopFlywheel, robot.PollenTurret.StopKicking);
+        StartShooting = sequential(robot.PollenTurret.DoFlywheel, parallel(robot.PollenTurret.RunFlywheel, robot.PollenTurret.StartKicking));
 
-        StopShooting = parallel(PollenTurret.StopFlywheel, IntakeManager.StopKicking, instant(() -> {StartShooting.cancel();}));//Make sure its dead
-        StartShooting = sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, IntakeManager.StartKicking));
-
-        ToggleShooting = conditional(() -> StartShooting.isScheduled(),
+        ToggleShooting = conditional(() -> robot.PollenTurret.RunFlywheel.isScheduled(),
                 StopShooting,
                 StartShooting
         );
@@ -67,7 +70,7 @@ public class TeleopMain extends OpMode {
 //        ManualDrive.driveOrHold(follower, powers);
 //        follower.update();
 
-        if(!HoldingA && gamepad1.a){schedule(IntakeManager.toggleIntakeMode);} HoldingA = gamepad1.a;
+        if(!HoldingA && gamepad1.a){schedule(robot.IntakeManager.toggleIntakeMode);} HoldingA = gamepad1.a;
         if(!HoldingB && gamepad1.b){schedule(ToggleShooting);} HoldingB = gamepad1.b;
 
         Scheduler.execute();
