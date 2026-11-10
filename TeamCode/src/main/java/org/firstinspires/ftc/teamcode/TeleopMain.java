@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import org.firstinspires.ftc.teamcode.helpers.Button;
 import  org.firstinspires.ftc.teamcode.subsystems.*; //All the subsystems
 
 
@@ -29,12 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class TeleopMain extends OpMode {
 
     private Follower follower;
-
-    boolean HoldingA = false; boolean HoldingB = false;
-//    IntakeTransferManager IntakeManager;
-//    Turret PollenTurret;
-    Command StartShooting; Command StopShooting; Command ToggleShooting;
-
+    Button btnA; Button btnB;
     Robot robot;
 
     @Override
@@ -42,20 +38,9 @@ public class TeleopMain extends OpMode {
         robot = new Robot(hardwareMap, true);
 
         follower = Constants.create(hardwareMap);
-//        IntakeManager = new IntakeTransferManager(
-//                hardwareMap.get(DcMotor.class, "intake"),
-//                hardwareMap.get(DcMotor.class, "transfer"),
-//                hardwareMap.get(CRServo.class, "pollenKicker"));
-//
-//        PollenTurret = new Turret(hardwareMap.get(DcMotorEx.class, "PollenTurret"));
 
-        StopShooting = parallel(robot.PollenTurret.StopFlywheel, robot.PollenTurret.StopKicking);
-        StartShooting = sequential(robot.PollenTurret.DoFlywheel, parallel(robot.PollenTurret.RunFlywheel, robot.PollenTurret.StartKicking));
-
-        ToggleShooting = conditional(() -> robot.PollenTurret.RunFlywheel.isScheduled(),
-                StopShooting,
-                StartShooting
-        );
+        btnA = new Button(()-> gamepad1.a);
+        btnB = new Button(() -> gamepad1.b);
     }
 
     @Override
@@ -70,9 +55,10 @@ public class TeleopMain extends OpMode {
 //        ManualDrive.driveOrHold(follower, powers);
 //        follower.update();
 
-        if(!HoldingA && gamepad1.a){schedule(robot.IntakeManager.toggleIntakeMode);} HoldingA = gamepad1.a;
-        if(!HoldingB && gamepad1.b){schedule(ToggleShooting);} HoldingB = gamepad1.b;
+        if(btnA.wasJustPressed()){schedule(robot.IntakeManager.toggleIntakeMode);}
+        if(btnB.wasJustPressed()){schedule(robot.ToggleShooting);}
 
         Scheduler.execute();
+        robot.update();
     }
 }

@@ -16,15 +16,15 @@ public class Turret {
     final double encoderResolutionTPR = 28.0;
     final double MaxRPM = 6000;
 
-    DcMotorEx Flywheel;
+    public DcMotorEx Flywheel;
 
-    CRServo kicker;
+    public CRServo kicker;
 
     double lastEncoderPosition;
     long lastTimeNano;
 
-    public double highVel = 5500;
-    public double lowVel = 1500;
+    public double highVel = 1000;
+    public double lowVel = 100;
 
     // Made public so the tuner OpMode can display them in telemetry
     public double curTargetVel = highVel;
@@ -153,7 +153,16 @@ public class Turret {
     public Command StartKicking = instant(() -> {kicker.setPower(1);}).requiring(kicker);
     public Command StopKicking = instant(() -> {kicker.setPower(0);}).requiring(kicker);
 
-    private final Button btnDpadUp = new Button(); private final Button btnDpadDown = new Button(); private final Button btnDpadLeft = new Button(); private final Button btnDpadRight = new Button(); private final Button btnX = new Button(); private final Button btnA = new Button(); private final Button btnLeftBumper = new Button(); private final Button btnRightBumper = new Button();
+
+    private final Button.ButtonSimple btnDpadUp = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnDpadDown = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnDpadLeft = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnDpadRight = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnX = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnA = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnB = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnLeftBumper = new Button.ButtonSimple();
+    private final Button.ButtonSimple btnRightBumper = new Button.ButtonSimple();
     public void handleTuningInput(com.qualcomm.robotcore.hardware.Gamepad gamepad) {
         if (btnDpadUp.wasJustPressed(gamepad.dpad_up))          { tuneP(1); updateTune(); }
         if (btnDpadDown.wasJustPressed(gamepad.dpad_down))      { tuneP(-1); updateTune(); }
@@ -182,6 +191,5 @@ public class Turret {
         telemetry.addData("Error (Target - Actual)", telemData[1]);
         telemetry.addData("Calculated RPM", getRPM());
         telemetry.addData("Target HighVel", highVel);
-        telemetry.update();
     }
 }
