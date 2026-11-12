@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.subsystems.AimSystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferManager;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
@@ -24,6 +25,7 @@ public class Robot {
     public IntakeTransferManager IntakeManager;
     public Turret PollenTurret;
     public Turret NectarTurret;
+    public AimSystem aimSystem;
 
     Command StartShooting; Command StopShooting; Command ToggleShooting;
 
@@ -38,12 +40,14 @@ public class Robot {
         PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"));
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
 
+        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"));
 
         // Robot level commands
-        StopShooting = parallel(PollenTurret.StopFlywheel, PollenTurret.StopKicking) .requiring(PollenTurret);
+        StopShooting = parallel(PollenTurret.StopFlywheel, PollenTurret.StopKicking).requiring(PollenTurret);
         StartShooting = sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking)).requiring(PollenTurret);
 
-        ToggleShooting = conditional(() -> PollenTurret.RunFlywheel.isScheduled(),
+        // Fix this toggle condition so it like stops ever
+        ToggleShooting = conditional(() -> isScheduled(PollenTurret.RunFlywheel) || isScheduled(PollenTurret.DoFlywheel),
                 StopShooting,
                 StartShooting
         );

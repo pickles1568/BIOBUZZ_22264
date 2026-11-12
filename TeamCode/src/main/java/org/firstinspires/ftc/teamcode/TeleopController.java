@@ -42,7 +42,8 @@ public class TeleopController {
 
 
         // Handle operator/shooter controls
-        if (shooterB.wasJustPressed()) {           schedule(robot.ToggleShooting);}
-        if (shooterRBump.wasJustPressed()){    }//shooterRightBump
+        if (shooterB.wasJustPressed()) {           }
+        if (shooterRBump.wasJustPressed()){        schedule(robot.ToggleShooting);}//shooterRightBump
+        robot.aimSystem.TurnSwivel(gamepad2.right_stick_x);
     }
 }

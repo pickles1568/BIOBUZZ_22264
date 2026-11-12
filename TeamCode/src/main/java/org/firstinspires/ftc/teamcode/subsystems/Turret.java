@@ -27,12 +27,11 @@ public class Turret {
     public double lowVel = 100;
 
     // Made public so the tuner OpMode can display them in telemetry
-    public double curTargetVel = highVel;
+    public double curTargetVel = 0;
     public double F = 10.0;
     public double P = 10.0;
 
-    public double[] stepSizes = {10.0, 1.0, 0.1, 0.001, 0.0001};
-    public int stepIndex = 1;
+
 
     public Turret(DcMotorEx Flywheel, CRServo kicker) {
         this.Flywheel = Flywheel;
@@ -46,35 +45,15 @@ public class Turret {
         Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfcoefficients);
     }
 
-    public void spinUp(){
-        if(curTargetVel == highVel){
-            curTargetVel = lowVel;
-        } else {
-            curTargetVel = highVel;
-        }
-    }
 
-    public void incrementStep(){
-        stepIndex = (stepIndex + 1) % stepSizes.length;
-    }
-
-    public void tuneF(int mult){
-        F += stepSizes[stepIndex] * mult;
-    }
-
-    public void tuneP(int mult){
-        P += stepSizes[stepIndex] * mult;
-    }
-
-    public void tuneHigh(int mult){highVel += stepSizes[stepIndex] * mult;}
-
-    public void updateTune(){
-        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0.0, 0.0, F);
-        Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-    }
 
     public void updateVel(){
-        Flywheel.setVelocity(curTargetVel);
+        if (curTargetVel == 0) { //this avoids the motor breaking
+            Flywheel.setVelocity(0);
+            Flywheel.setPower(0);
+        } else {
+            Flywheel.setVelocity(curTargetVel);
+        }
     }
 
     public double[] getTelemData() {
@@ -98,9 +77,7 @@ public class Turret {
         return (delta / encoderResolutionTPR) / dt * 60.0;
     }
 
-    public void STOP() {
-        Flywheel.setPower(0);
-    }
+    public void STOP() { curTargetVel = 0; Flywheel.setPower(0); Flywheel.setVelocity(0); }
 
     public double getEncoder() {
         return Flywheel.getCurrentPosition();
@@ -108,7 +85,7 @@ public class Turret {
 
     double CurVel;
     double Error;
-    double tolerence = 50;
+    double tolerance = 50;
 
     public Command DoFlywheel = Command.build()
             .setStart(() -> {
@@ -121,7 +98,7 @@ public class Turret {
                 updateVel();
             })
             .setDone(() -> {
-                return Error <= tolerence;
+                return Math.abs(Error) <= tolerance;
             })
             .requiring(Flywheel);
 
@@ -132,14 +109,13 @@ public class Turret {
             .setExecute(() -> {
                 updateVel();
             })
-            .setDone(() -> false) // Runs continuously until interrupted/stopped
+            .setDone(() -> false)
             .requiring(Flywheel);
 
     public Command StopFlywheel = Command.build()
             .setStart(() -> {
                 curTargetVel = 0;
-                Flywheel.setVelocity(0);
-                Flywheel.setPower(0);
+                updateVel();
             })
             .setDone(() -> true)
             .requiring(Flywheel);
@@ -154,6 +130,13 @@ public class Turret {
     public Command StopKicking = instant(() -> {kicker.setPower(0);}).requiring(kicker);
 
 
+    public void testSpinUp(){
+        if(curTargetVel == highVel){
+            curTargetVel = lowVel;
+        } else {
+            curTargetVel = highVel;
+        }
+    }
     private final Button.ButtonSimple btnDpadUp = new Button.ButtonSimple();
     private final Button.ButtonSimple btnDpadDown = new Button.ButtonSimple();
     private final Button.ButtonSimple btnDpadLeft = new Button.ButtonSimple();
@@ -171,11 +154,29 @@ public class Turret {
         if (btnLeftBumper.wasJustPressed(gamepad.left_bumper))  { tuneHigh(1); updateTune(); }
         if (btnRightBumper.wasJustPressed(gamepad.right_bumper)){ tuneHigh(-1); updateTune(); }
         if (btnX.wasJustPressed(gamepad.x))                     { incrementStep(); }
-        if (btnA.wasJustPressed(gamepad.a))                     { spinUp(); }
+        if (btnA.wasJustPressed(gamepad.a))                     { testSpinUp(); }
         if (gamepad.b)                                          { kicker.setPower(1);}else{ kicker.setPower(0);}
 
         updateVel();
     }
+
+    public void incrementStep(){
+        stepIndex = (stepIndex + 1) % stepSizes.length;
+    }
+    public void tuneF(int mult){
+        F += stepSizes[stepIndex] * mult;
+    }
+    public void tuneP(int mult){
+        P += stepSizes[stepIndex] * mult;
+    }
+    public void tuneHigh(int mult){highVel += stepSizes[stepIndex] * mult;}
+    public void updateTune(){
+        PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0.0, 0.0, F);
+        Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+    }
+
+    public double[] stepSizes = {10.0, 1.0, 0.1, 0.001, 0.0001};
+    public int stepIndex = 1;
     public void sendTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
         double[] telemData = getTelemData();
         telemetry.addData("Controls", "Dpad Up/Down: P | Dpad Right/Left: F");
