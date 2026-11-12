@@ -43,8 +43,8 @@ public class Robot {
         aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"));
 
         // Robot level commands
-        StopShooting = parallel(PollenTurret.StopFlywheel, PollenTurret.StopKicking).requiring(PollenTurret);
-        StartShooting = sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking)).requiring(PollenTurret);
+        StopShooting = parallel(PollenTurret.StopFlywheel, PollenTurret.StopKicking, NectarTurret.StopKicking, NectarTurret.StopFlywheel);//  .requiring(PollenTurret);
+        StartShooting = parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking, NectarTurret.StartKicking, NectarTurret.RunFlywheel);//   sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking)).requiring(PollenTurret);
 
         // Fix this toggle condition so it like stops ever
         ToggleShooting = conditional(() -> isScheduled(PollenTurret.RunFlywheel) || isScheduled(PollenTurret.DoFlywheel),
