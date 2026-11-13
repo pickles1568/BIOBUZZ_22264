@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.groups.Groups.parallel;
+import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -31,7 +33,7 @@ public class Turret {
     public double F = 10.0;
     public double P = 10.0;
 
-
+    public boolean IsShooting = false;
 
     public Turret(DcMotorEx Flywheel, CRServo kicker) {
         this.Flywheel = Flywheel;
@@ -85,7 +87,7 @@ public class Turret {
 
     double CurVel;
     double Error;
-    double tolerance = 50;
+    double tolerance = 100;
 
     public Command DoFlywheel = Command.build()
             .setStart(() -> {
@@ -112,22 +114,40 @@ public class Turret {
             .setDone(() -> false)
             .requiring(Flywheel);
 
-    public Command StopFlywheel = Command.build()
-            .setStart(() -> {
-                curTargetVel = 0;
-                updateVel();
-            })
-            .setDone(() -> true)
-            .requiring(Flywheel);
 
-    public Command ToggleFlywheel = conditional(
-            () -> DoFlywheel.isScheduled(),
-            StopFlywheel,
-            DoFlywheel
-    );
 
-    public Command StartKicking = instant(() -> {kicker.setPower(1);}).requiring(kicker);
-    public Command StopKicking = instant(() -> {kicker.setPower(0);}).requiring(kicker);
+    //slop slop slop
+    // RPM requested by the aim system. 0 means "Idk", so highVel.
+    public double aimRPM = 0;
+
+    public void setAimRPM(double rpm) { aimRPM = rpm; }
+
+    public double getShootVel() {
+        if (aimRPM <= 0) return highVel;                       // no target, use default
+        double rpm = Math.min(aimRPM, MaxRPM);                 // don't ask for more than the motor can do
+        return rpm * encoderResolutionTPR / 60.0;              // RPM -> ticks/s
+    }
+    public void applyShootVel() { //If dist changes while shooting this corrects
+        if (IsShooting) curTargetVel = getShootVel();
+    }
+
+    //public Command SpinUp = instant(() -> { curTargetVel = highVel; IsShooting = true; });
+    public Command SpinUp = instant(() -> { curTargetVel = getShootVel(); IsShooting = true; });
+
+    public Command StopFlywheel = instant(() -> { curTargetVel = 0; IsShooting = false; });
+
+
+    public Command StartKicking = instant(() -> { if (IsShooting) kicker.setPower(1); }).requiring(kicker);
+    public Command StopKicking  = instant(() -> kicker.setPower(0)).requiring(kicker);
+
+
+    public Command WaitForSpeed = Command.build()
+            .setExecute(() -> {})
+            .setDone(() -> !IsShooting || Math.abs(curTargetVel - Flywheel.getVelocity()) <= tolerance); //finishes when interupted or we are within tolerance
+
+    public Command StartShooting = sequential(SpinUp, WaitForSpeed, StartKicking);
+    public Command StopShooting  = parallel(StopFlywheel, StopKicking);
+
 
 
     public void testSpinUp(){

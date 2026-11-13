@@ -83,7 +83,7 @@ public class OctoQuadTuner extends Procedure {
                 "    c.globalDistanceUnit.set(DistanceUnit.INCH);\n" +
                 "    c.offsetUnits.set(DistanceUnit.INCH);\n" +
                 "    c.i2cRecoveryMode.set(OctoQuad.I2cRecoveryMode." + recoveryMode.get() + ");\n" +
-                "    c.headingScalar.set(" + headingScalar + ");\n" +
+                "    c.headingScalar.set(" + headingScalar + ");\n"     +
                 "});");
     }
 }

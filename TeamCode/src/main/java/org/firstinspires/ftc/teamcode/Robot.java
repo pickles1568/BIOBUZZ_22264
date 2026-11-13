@@ -27,7 +27,9 @@ public class Robot {
     public Turret NectarTurret;
     public AimSystem aimSystem;
 
-    Command StartShooting; Command StopShooting; Command ToggleShooting;
+     Command ToggleShooting;
+    public Command StartShooting;
+    public Command StopShooting;
 
     // Pass HardwareMap into the constructor
     public Robot(HardwareMap hwMap, Boolean IsRedAlliance){
@@ -40,21 +42,24 @@ public class Robot {
         PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"));
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
 
-        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"));
+        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), IsRedAlliance);
 
         // Robot level commands
-        StopShooting = parallel(PollenTurret.StopFlywheel, PollenTurret.StopKicking, NectarTurret.StopKicking, NectarTurret.StopFlywheel);//  .requiring(PollenTurret);
-        StartShooting = parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking, NectarTurret.StartKicking, NectarTurret.RunFlywheel);//   sequential(PollenTurret.DoFlywheel, parallel(PollenTurret.RunFlywheel, PollenTurret.StartKicking)).requiring(PollenTurret);
-
-        // Fix this toggle condition so it like stops ever
-        ToggleShooting = conditional(() -> isScheduled(PollenTurret.RunFlywheel) || isScheduled(PollenTurret.DoFlywheel),
-                StopShooting,
-                StartShooting
-        );
+        StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);
+        StopShooting  = parallel(PollenTurret.StopShooting,  NectarTurret.StopShooting);
+        ToggleShooting = conditional(() -> PollenTurret.IsShooting, StopShooting, StartShooting);
     }
     public Robot(HardwareMap hwMap) {this(hwMap, true);} //if no boolean passed in assume true
 
     public void update(){
+        aimSystem.update();   // first, so ReqRPM is fresh
+
+        PollenTurret.setAimRPM(aimSystem.ReqRPM);
+        NectarTurret.setAimRPM(aimSystem.ReqRPM);
+
+        PollenTurret.applyShootVel();
+        NectarTurret.applyShootVel();
+
         PollenTurret.updateVel();
         NectarTurret.updateVel();
     }
