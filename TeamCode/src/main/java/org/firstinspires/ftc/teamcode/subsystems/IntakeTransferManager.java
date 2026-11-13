@@ -4,14 +4,14 @@ import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant;
 
 import com.pedropathing.ivy.Command;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class IntakeTransferManager {
     DcMotor Intake;
     DcMotor Transfer;
-    Boolean Collecting = false;
+    boolean Collecting = false;
+    boolean Expelling = false;
 
     public IntakeTransferManager(DcMotor Intake, DcMotor Transfer) {
         this.Intake = Intake;
@@ -23,8 +23,9 @@ public class IntakeTransferManager {
         Transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true;}).requiring(Intake, Transfer);
-    Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false;}).requiring(Intake, Transfer);
+    Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true; Expelling = false;}).requiring(Intake, Transfer);
+    Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false; Expelling = false;}).requiring(Intake, Transfer);
+    Command ReveseIntake = instant(() -> {Intake.setPower(-1); Transfer.setPower(-1); Collecting = false; Expelling = true;});
 
     Command ActivateTransfer = instant(() -> {Transfer.setPower(1);}).requiring(Transfer);
     Command StopTransfer = instant(() -> {Transfer.setPower(0);}).requiring(Transfer);
@@ -33,6 +34,12 @@ public class IntakeTransferManager {
             () -> Collecting,
             StopCollecting,
             StartCollecting
+    ).requiring(Intake, Transfer);
+
+    public Command toggleReverseIntakeMode = conditional(
+            () -> Expelling,
+            StopCollecting,
+            ReveseIntake
     ).requiring(Intake, Transfer);
 
 }

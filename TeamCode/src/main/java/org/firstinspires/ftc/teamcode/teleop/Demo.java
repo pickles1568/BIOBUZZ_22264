@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import org.firstinspires.ftc.teamcode.helpers.Button;
 
-@TeleOp(name = "Demo TeleOp")
+@TeleOp(name = "Demo TeleOp", group = "1 - Demos")
 public class Demo extends OpMode {
 
     private Follower follower;

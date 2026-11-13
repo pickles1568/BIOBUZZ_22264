@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.TeleopController;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@TeleOp(name = "RED TeleOp")
+@TeleOp(name = "RED TeleOp", group = "0 - Game Ready")
 public class RedTeleOp extends OpMode {
 
     private Follower follower;

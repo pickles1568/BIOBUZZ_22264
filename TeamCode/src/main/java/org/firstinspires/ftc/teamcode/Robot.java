@@ -27,7 +27,7 @@ public class Robot {
     public Turret NectarTurret;
     public AimSystem aimSystem;
 
-     Command ToggleShooting;
+    public Command ToggleShooting;
     public Command StartShooting;
     public Command StopShooting;
 

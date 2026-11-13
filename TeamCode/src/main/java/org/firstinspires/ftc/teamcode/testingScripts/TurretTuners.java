@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testingScripts;
 
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.helpers.Button;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Turret Tuner", group = "Tuning")
+@TeleOp(name = "Turret Tuner", group = "2 - Testing")
 public class TurretTuners extends LinearOpMode {
 
     Robot robot;

@@ -10,6 +10,7 @@ public class TeleopController {
 
     //Driver A buttons
     private final Button driverA;
+    private final Button driverB;
     private final Button driverLBump;
     private final Button driverRBump;
 
@@ -25,6 +26,7 @@ public class TeleopController {
 
         //driver Button binding
         this.driverA = new Button(() -> gamepad1.a);
+        this.driverB = new Button(() -> gamepad1.b);
         this.driverLBump = new Button(() -> gamepad1.left_bumper);
         this.driverRBump = new Button(() -> gamepad1.right_bumper);
 
@@ -37,6 +39,7 @@ public class TeleopController {
     public void update(Gamepad gamepad1, Gamepad gamepad2) {
         // Handle driver controls
         if (driverA.wasJustPressed()) {            schedule(robot.IntakeManager.toggleIntakeMode);}
+        if (driverB.wasJustPressed()) {            schedule(robot.IntakeManager.toggleReverseIntakeMode);}
 
         if (driverLBump.isHeld() || driverRBump.isHeld())     {            }//slow mode
 
