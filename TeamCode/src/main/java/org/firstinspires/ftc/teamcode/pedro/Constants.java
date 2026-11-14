@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.algorithm.ForesightConfig;
 import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Matrix;
 import com.pedropathing.math.Vector2D;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -43,6 +45,32 @@ public class Constants {
         c.globalDistanceUnit.set(DistanceUnit.INCH);
         c.offsetUnits.set(DistanceUnit.INCH);
     });
+
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                Controller primaryTranslationalForward = Controller.proportional(0.22828204987793282);
+                Controller secondaryTranslationalForward = Controller.proportional(0.08434411762118167);
+                Controller primaryTranslationalLateral = Controller.proportional(0.22430787216827477);
+                Controller secondaryTranslationalLateral = Controller.proportional(0.08287576514944717);
+
+                c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
+                c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
+
+                c.coast.set(Controller.proportionalFeedforward(0.013964598237654969));
+                c.brake.set(Controller.proportionalFeedforward(0.011869908502006723));
+
+                c.headingFeedback.set(Controller.proportional(5.302184006839192));
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.056420115112856765, 0.0457850918140785));
+
+                c.linearBrakeCoefficients.set(Matrix.diag(0.019325492975165833, 0.0714093891969658));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.002215530772017073, 0.0010117428843690415));
+
+                c.maxAchievableForwardVelocity.set(78.12764252314517);
+                c.maxAchievableStrafeVelocity.set(77.6455907285766);
+                c.naturalForwardDeceleration.set(55.702121806916466);
+                c.naturalStrafeDeceleration.set(56.430072438593356);
+            }
+    );
 
     public static CoaxialServoPodConfig rightBack = new CoaxialServoPodConfig(
             c -> {
