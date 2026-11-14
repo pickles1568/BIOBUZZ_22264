@@ -54,6 +54,8 @@ public class Constants {
                 c.servoDirection.set(Servo.Direction.FORWARD);
                 c.servoMinPosition.set(0.0);
                 c.servoMaxPosition.set(1.0);
+                c.servoMinAngleRad.set(-Math.PI);
+                c.servoMaxAngleRad.set(Math.PI);
                 c.angleOffsetRad.set(0.0);
                 c.analogMinVoltage.set(0.018);
                 c.analogMaxVoltage.set(3.19);
@@ -76,6 +78,8 @@ public class Constants {
                 c.servoDirection.set(Servo.Direction.FORWARD);
                 c.servoMinPosition.set(0.0);
                 c.servoMaxPosition.set(1.0);
+                c.servoMinAngleRad.set(-Math.PI);
+                c.servoMaxAngleRad.set(Math.PI);
                 c.analogMinVoltage.set(0.019);
                 c.analogMaxVoltage.set(3.21);
                 c.angleOffsetRad.set(0.0);
@@ -94,6 +98,8 @@ public class Constants {
                 c.servoDirection.set(Servo.Direction.FORWARD);
                 c.servoMinPosition.set(0.0);
                 c.servoMaxPosition.set(1.0);
+                c.servoMinAngleRad.set(-Math.PI);
+                c.servoMaxAngleRad.set(Math.PI);
                 c.analogMinVoltage.set(0.014);
                 c.analogMaxVoltage.set(3.164);
                 c.angleOffsetRad.set(0.0);
@@ -112,6 +118,8 @@ public class Constants {
                 c.servoDirection.set(Servo.Direction.FORWARD);
                 c.servoMinPosition.set(0.0);
                 c.servoMaxPosition.set(1.0);
+                c.servoMinAngleRad.set(-Math.PI);
+                c.servoMaxAngleRad.set(Math.PI);
                 c.analogMinVoltage.set(0.017);
                 c.analogMaxVoltage.set(3.178);
                 c.angleOffsetRad.set(0.0);

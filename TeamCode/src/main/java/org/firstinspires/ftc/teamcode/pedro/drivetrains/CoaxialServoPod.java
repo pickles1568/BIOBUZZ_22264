@@ -34,6 +34,11 @@ public class CoaxialServoPod implements SwervePod {
         this.name = config.name.get();
         this.driveMotor = hardwareMap.get(DcMotorEx.class, config.motorName.get());
         this.turnServo = hardwareMap.get(Servo.class, config.servoName.get());
+        if (this.turnServo instanceof com.qualcomm.robotcore.hardware.PwmControl) {
+            ((com.qualcomm.robotcore.hardware.PwmControl) this.turnServo).setPwmRange(
+                    new com.qualcomm.robotcore.hardware.PwmControl.PwmRange(500, 2500)
+            );
+        }
         String encoderName = config.servoEncoderName.get();
         this.turnEncoder = createAnalogEncoder(hardwareMap, encoderName);
         setToFloat();
@@ -53,8 +58,10 @@ public class CoaxialServoPod implements SwervePod {
         double target0 = Angle.normalize(0.0 + config.angleOffsetRad.get());
         double norm0 = Utils.clamp((target0 - minAngle) / (maxAngle - minAngle), 0.0, 1.0);
         double initPos = minPos + norm0 * (maxPos - minPos);
-        lastServoPosition = Utils.clamp(initPos, minPos, maxPos);
-        turnServo.setPosition(lastServoPosition);
+        double pos = Utils.clamp(initPos, minPos, maxPos);
+        turnServo.setPosition(pos);
+        // Set lastServoPosition to -1 so the first move() call during OpMode loop always forces a servo update
+        lastServoPosition = -1.0;
     }
 
     private static AnalogInput createAnalogEncoder(HardwareMap hardwareMap, String encoderName) {
@@ -139,13 +146,13 @@ public class CoaxialServoPod implements SwervePod {
         double minAngle = config.servoMinAngleRad.get();
         double maxAngle = config.servoMaxAngleRad.get();
 
-        double currentPos = (lastServoPosition >= 0) ? lastServoPosition : turnServo.getPosition();
+        double currentPos = (lastServoPosition >= 0) ? lastServoPosition : (minPos + 0.5 * (maxPos - minPos));
         double clampedCurrentPos = Utils.clamp(currentPos, minPos, maxPos);
 
         //Compute possible target angles(1 is positive and 2 is negative)
         double baseTargetRad = encoderReversed ? (Math.PI / 2.0 - targetAngleRad) : (targetAngleRad - Math.PI / 2.0);
-        double target1 = Angle.normalize(baseTargetRad + config.angleOffsetRad.get());
-        double target2 = Angle.normalize(target1 + Math.PI);
+        double target1 = Angle.normalizeSigned(baseTargetRad + config.angleOffsetRad.get());
+        double target2 = Angle.normalizeSigned(target1 + Math.PI);
 
         //Map both to servo limits
         double norm1 = Utils.clamp((target1 - minAngle) / (maxAngle - minAngle), 0.0, 1.0);
@@ -169,6 +176,11 @@ public class CoaxialServoPod implements SwervePod {
             targetPos = pos2;
             finalDrivePower = -drivePower;
         }
+
+        // Scale drive power if the servo is still turning towards targetPos
+        double posError = Math.abs(targetPos - clampedCurrentPos);
+        double alignmentScale = Math.max(0.0, 1.0 - (posError * 4.0));
+        finalDrivePower *= alignmentScale;
 
         //Update hardware with caching thresholds
         double servoCachingThreshold = config.servoCachingThreshold.get();
