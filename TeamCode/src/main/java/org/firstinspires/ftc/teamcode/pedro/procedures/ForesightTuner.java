@@ -246,7 +246,7 @@ class StrafeVelocity extends TuningOpMode<Double> {
         localizer.setPose(Pose.zero());
         localizer.update();
 
-        DrivePowers power = new DrivePowers(0,1,0);
+        DrivePowers power = new DrivePowers(0,-1,0);
 
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
@@ -406,7 +406,7 @@ class StrafeDeceleration extends TuningOpMode<Double> {
         localizer.setPose(Pose.zero());
         localizer.update();
 
-        DrivePowers power = new DrivePowers(0, 1, 0);
+        DrivePowers power = new DrivePowers(0, -1, 0);
         Thread.sleep(1000);
         waitForStart();
         localizer.setPose(Pose.zero());
@@ -850,7 +850,7 @@ class ForwardBraking extends TuningOpMode<List<Double>> {
         double angularVel = localizer.velocity().omega;
         double brakeDist = headingLinear * angularVel +
                 headingQuadratic * angularVel * angularVel * Math.signum(angularVel);
-        double headingError = Angle.normalizeSigned(-localizer.pose().heading());
+        double headingError = Angle.normalizeSigned(localizer.pose().heading());
         double error = headingError - brakeDist;
         return Utils.clamp(headingKP * error, -0.3, 1.0) / 2;
     }
@@ -969,7 +969,7 @@ class StrafeBraking extends TuningOpMode<List<Double>> {
         localizer.update();
         timer.reset();
 
-        drivetrain.drive(new DrivePowers(0,maxPower,0), false);
+        drivetrain.drive(new DrivePowers(0,-maxPower,0), false);
 
         while (state != State.DONE && !isStopRequested()) {
             localizer.update();
@@ -1029,13 +1029,13 @@ class StrafeBraking extends TuningOpMode<List<Double>> {
         double angularVel = localizer.velocity().omega;
         double brakeDist = headingLinear * angularVel +
                 headingQuadratic * angularVel * angularVel * Math.signum(angularVel);
-        double headingError = Angle.normalizeSigned(-localizer.pose().heading());
+        double headingError = Angle.normalizeSigned(localizer.pose().heading());
         double error = headingError - brakeDist;
         return Utils.clamp(headingKP * error, -0.3, 1.0) / 2;
     }
 
     private void drive(Drivetrain drivetrain, Localizer localizer) {
-        drivetrain.drive(new DrivePowers(0.0, power * direction, getHeadingPower(localizer)), false);
+        drivetrain.drive(new DrivePowers(0.0, -power * direction, getHeadingPower(localizer)), false);
     }
 
     private void brake(Drivetrain drivetrain, Localizer localizer) {
@@ -1049,7 +1049,7 @@ class StrafeBraking extends TuningOpMode<List<Double>> {
             brake = Math.max(brake, minBrake);
         }
 
-        drivetrain.drive(new DrivePowers(0, brake, headingPower), false);
+        drivetrain.drive(new DrivePowers(0, -brake, headingPower), false);
     }
 
     private void collectTrialData(Localizer localizer, Drivetrain drivetrain) {
@@ -1260,7 +1260,7 @@ class StrafeTranslational extends TuningOpMode<List<Double>> {
         localizer.update();
         timer.reset();
         lastTime = timer.seconds();
-        drivetrain.drive(new DrivePowers(0.0, POWER, 0.0), false);
+        drivetrain.drive(new DrivePowers(0.0, -POWER, 0.0), false);
 
         while (!done && !isStopRequested()) {
             double now = timer.seconds();
@@ -1283,7 +1283,7 @@ class StrafeTranslational extends TuningOpMode<List<Double>> {
                     systemIdentification();
                     drivetrain.drive(new DrivePowers(0.0, 0.0, 0.0), false);
                 } else {
-                    drivetrain.drive(new DrivePowers(0.0, POWER, 0.0), false);
+                    drivetrain.drive(new DrivePowers(0.0, -POWER, 0.0), false);
                 }
             }
         }
