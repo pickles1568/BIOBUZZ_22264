@@ -40,6 +40,8 @@ public class RedTeleOp extends OpMode {
         follower.manual(powers);
         follower.update();
 
+
+
         controls.update(gamepad1, gamepad2);
 
         Scheduler.execute();

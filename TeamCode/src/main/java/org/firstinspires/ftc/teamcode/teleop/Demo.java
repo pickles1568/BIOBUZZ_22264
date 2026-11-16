@@ -23,16 +23,21 @@ public class Demo extends OpMode {
     Button shooterB;
     Button shooterX;
     Button shooterY;
+    Button Turret1;
+    Button Turret2;
+    Button Turret3;
+
 
     @Override
     public void init() {
         robot = new Robot(hardwareMap, false);
         follower = Constants.create(hardwareMap);
         controls = new TeleopController(robot, gamepad1, gamepad2);
-        shooterA = new Button(() -> gamepad1.a);
-        shooterB = new Button(() -> gamepad1.b);
         shooterX = new Button(() -> gamepad1.x);
         shooterY = new Button(() -> gamepad1.y);
+        Turret1 = new Button(() -> gamepad1.dpad_left);
+        Turret2 = new Button(() -> gamepad1.dpad_up);
+        Turret3 = new Button(() -> gamepad1.dpad_right);
     }
 
     @Override
@@ -40,21 +45,23 @@ public class Demo extends OpMode {
 
         controls.update(gamepad1, gamepad2);
 
-        if (shooterX.wasJustPressed()){ // Low
-            robot.PollenTurret.curTargetVel = 1500;
-            robot.NectarTurret.curTargetVel = 1500;
-        }else if (shooterY.wasJustPressed()){// Med
-            robot.PollenTurret.curTargetVel = 1000;
-            robot.NectarTurret.curTargetVel = 1000;
-        }else if(shooterB.wasJustPressed()){// High
-            robot.PollenTurret.curTargetVel = 500;
-            robot.NectarTurret.curTargetVel = 500;
+        if (shooterX.wasJustPressed()){ // High
+            robot.PollenTurret.Flywheel.setPower(1);
+            robot.NectarTurret.Flywheel.setPower(1);
         }
-
         if (shooterY.wasJustPressed()){// STOP
-            Scheduler.schedule(robot.PollenTurret.StopFlywheel, robot.NectarTurret.StopFlywheel);
+            robot.PollenTurret.Flywheel.setPower(0);
+            robot.NectarTurret.Flywheel.setPower(0);
         }
-
+        if (Turret1.wasJustPressed()){
+            robot.aimSystem.TurnSwivel(0.45);
+        }
+        if (Turret2.wasJustPressed()){
+            robot.aimSystem.TurnSwivel(0.5);
+        }
+        if (Turret3.wasJustPressed()){
+            robot.aimSystem.TurnSwivel(0.55);
+        }
 
         Scheduler.execute();
         robot.update();

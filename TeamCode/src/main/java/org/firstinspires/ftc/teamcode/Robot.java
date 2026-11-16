@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.subsystems.AimSystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferManager;
@@ -45,7 +46,7 @@ public class Robot {
         PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"));
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
 
-        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), IsRedAlliance);
+        aimSystem = new AimSystem(hwMap.get(Servo.class, "Swivel"), IsRedAlliance);
 
         // Robot level commands
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);

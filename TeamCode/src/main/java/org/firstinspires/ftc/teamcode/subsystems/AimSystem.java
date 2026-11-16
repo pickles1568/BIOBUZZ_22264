@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class AimSystem {
 
@@ -10,15 +11,15 @@ public class AimSystem {
     public float DistanceToShoot;
     public float ReqRPM;
 
-    CRServo Swivel;
-    public AimSystem(CRServo Swivel, Boolean IsRedAlliance){
+    Servo Swivel;
+    public AimSystem(Servo Swivel, Boolean IsRedAlliance){
         this.Swivel = Swivel;
         this.CanSeeHive = false;
         this.ReqRPM = 0;
     }
 
-    public void TurnSwivel(double Pwr){
-        Swivel.setPower(Pwr);
+    public void TurnSwivel(double Pos){
+        Swivel.setPosition(Pos);
     }
 
     public float CalcRPM(float distance){
