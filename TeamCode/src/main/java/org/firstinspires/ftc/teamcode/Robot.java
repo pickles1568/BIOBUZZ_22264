@@ -34,10 +34,13 @@ public class Robot {
     public Command StartShooting;
     public Command StopShooting;
 
+    public HardwareMap hwMap;
+
     public Command ShootForMoment;
     // Pass HardwareMap into the constructor
     public Robot(HardwareMap hwMap, Boolean IsRedAlliance){
         this.IsRedAlliance = IsRedAlliance;
+        this.hwMap = hwMap;
 
         IntakeManager = new IntakeTransferManager(
                 hwMap.get(DcMotor.class, "intake"),

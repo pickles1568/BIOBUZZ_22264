@@ -30,18 +30,6 @@ public class RedTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        DrivePowers powers = ManualDrive.fieldCentric(
-                -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x,
-                follower.pose().heading()
-        );
-
-        follower.manual(powers);
-        follower.update();
-
-
-
         controls.update(gamepad1, gamepad2);
 
         Scheduler.execute();
