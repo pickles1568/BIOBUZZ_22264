@@ -22,6 +22,9 @@ public class BlueTeleOp extends OpMode {
         robot = new Robot(hardwareMap, false);
         follower = Constants.create(hardwareMap);
         controls = new TeleopController(robot, gamepad1, gamepad2);
+
+        telemetry.addLine("Initialized! BLUE");
+        telemetry.update();
     }
 
     @Override
