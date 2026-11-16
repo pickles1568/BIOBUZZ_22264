@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.algorithm.ForesightConfig;
 import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
@@ -168,7 +169,7 @@ public class Constants {
     }
 
     public static Follower create(HardwareMap hardwareMap) {
-        return new Follower(new PinpointLocalizer(hardwareMap, localizerConfig), createDrivetrain(hardwareMap), null);
+        return new Follower(new PinpointLocalizer(hardwareMap, localizerConfig), createDrivetrain(hardwareMap), new Foresight(foresightConfig));
 
     }
 

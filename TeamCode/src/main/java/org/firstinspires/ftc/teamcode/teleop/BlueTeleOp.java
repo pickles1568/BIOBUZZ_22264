@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -29,7 +31,15 @@ public class BlueTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        //DREW FINISH THE DRIVING
+        DrivePowers powers = ManualDrive.fieldCentric(
+                -gamepad1.left_stick_y,
+                gamepad1.left_stick_x,
+                gamepad1.right_stick_x,
+                follower.pose().heading()
+        );
+
+        follower.manual(powers);
+        follower.update();
 
         controls.update(gamepad1, gamepad2);
 

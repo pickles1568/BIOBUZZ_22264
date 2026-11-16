@@ -3,7 +3,9 @@ import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.helpers.Button;
 
 
+import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.ivy.Scheduler;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
@@ -35,15 +37,14 @@ public class TeleopMain extends OpMode {
 
     @Override
     public void loop() {
-//        DrivePowers powers = ManualDrive.fieldCentric(
-//                -gamepad1.left_stick_y,
-//                gamepad1.left_stick_x,
-//                gamepad1.right_stick_x,
-//                follower.pose().heading()
-//        );
-//
-//        ManualDrive.driveOrHold(follower, powers);
-//        follower.update();
+        DrivePowers powers = ManualDrive.fieldCentric(
+                -gamepad1.left_stick_y,
+                gamepad1.left_stick_x,
+                gamepad1.right_stick_x,
+                follower.pose().heading()
+        );
+        follower.manual(powers);
+        follower.update();
 
         if(btnA.wasJustPressed()){schedule(robot.IntakeManager.toggleIntakeMode);}
         if(btnB.wasJustPressed()){schedule(robot.ToggleShooting);}
