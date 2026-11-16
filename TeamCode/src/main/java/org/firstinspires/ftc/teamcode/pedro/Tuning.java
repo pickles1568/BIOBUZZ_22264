@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.revhub.localizers.PinpointLocalizer;
 import com.pedropathing.tuning.autotune.Procedure;
 import com.pedropathing.tuning.autotune.Tuner;
@@ -14,7 +15,7 @@ public class Tuning {
         return new Tests(
                 Constants::createDrivetrain,
                 hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig),
-                null
+                () -> new Foresight(Constants.foresightConfig)
         );
     }
 
