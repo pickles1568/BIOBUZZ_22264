@@ -7,6 +7,8 @@ import static com.pedropathing.ivy.Scheduler.isScheduled;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
+import static com.pedropathing.ivy.groups.Groups.deadline;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -31,6 +33,7 @@ public class Robot {
     public Command StartShooting;
     public Command StopShooting;
 
+    public Command ShootForMoment;
     // Pass HardwareMap into the constructor
     public Robot(HardwareMap hwMap, Boolean IsRedAlliance){
         this.IsRedAlliance = IsRedAlliance;
@@ -48,6 +51,12 @@ public class Robot {
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);
         StopShooting  = parallel(PollenTurret.StopShooting,  NectarTurret.StopShooting);
         ToggleShooting = conditional(() -> PollenTurret.IsShooting, StopShooting, StartShooting);
+
+        Command ShootForMoment = sequential(
+                StopShooting,
+                waitMs(500),
+                StopShooting
+        );
     }
     public Robot(HardwareMap hwMap) {this(hwMap, true);} //if no boolean passed in assume true
 

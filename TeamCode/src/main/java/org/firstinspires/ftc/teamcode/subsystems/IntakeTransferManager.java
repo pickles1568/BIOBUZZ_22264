@@ -23,8 +23,8 @@ public class IntakeTransferManager {
         Transfer.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true; Expelling = false;}).requiring(Intake, Transfer);
-    Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false; Expelling = false;}).requiring(Intake, Transfer);
+    public Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true; Expelling = false;}).requiring(Intake, Transfer);
+    public Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false; Expelling = false;}).requiring(Intake, Transfer);
     Command ReveseIntake = instant(() -> {Intake.setPower(-1); Transfer.setPower(-1); Collecting = false; Expelling = true;});
 
     Command ActivateTransfer = instant(() -> {Transfer.setPower(1);}).requiring(Transfer);
