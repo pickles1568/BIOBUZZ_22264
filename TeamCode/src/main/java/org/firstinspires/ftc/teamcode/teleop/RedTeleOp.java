@@ -22,7 +22,8 @@ public class RedTeleOp extends OpMode {
     public void init() {
         robot = new Robot(hardwareMap, true);
         follower = Constants.create(hardwareMap);
-        controls = new TeleopController(robot, gamepad1, gamepad2);
+        follower.setPose(com.pedropathing.math.Pose.zero());
+        controls = new TeleopController(robot, follower, gamepad1, gamepad2);
 
         telemetry.addLine("Initialized! RED");
         telemetry.update();

@@ -32,7 +32,8 @@ public class Demo extends OpMode {
     public void init() {
         robot = new Robot(hardwareMap, false);
         follower = Constants.create(hardwareMap);
-        controls = new TeleopController(robot, gamepad1, gamepad2);
+        follower.setPose(com.pedropathing.math.Pose.zero());
+        controls = new TeleopController(robot, follower, gamepad1, gamepad2);
         shooterX = new Button(() -> gamepad1.x);
         shooterY = new Button(() -> gamepad1.y);
         Turret1 = new Button(() -> gamepad1.dpad_left);

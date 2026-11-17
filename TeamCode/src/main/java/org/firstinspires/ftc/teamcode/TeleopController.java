@@ -5,9 +5,9 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
+import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.helpers.Button;
-import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 public class TeleopController {
 
@@ -19,23 +19,25 @@ public class TeleopController {
     private final Button driverB;
     private final Button driverLBump;
     private final Button driverRBump;
+    private final Button driverResetHeading;
 
     //Driver B Buttons
     private final Button shooterB;
     private final Button shooterRBump;
     private final Button shooterLBump;
 
+    private double headingOffset = 0.0;
 
-
-    public TeleopController(Robot robot, Gamepad gamepad1, Gamepad gamepad2) {
+    public TeleopController(Robot robot, Follower follower, Gamepad gamepad1, Gamepad gamepad2) {
         this.robot = robot;
-        follower = Constants.create(robot.hwMap);
+        this.follower = follower;
 
         //driver Button binding
         this.driverA = new Button(() -> gamepad1.a);
         this.driverB = new Button(() -> gamepad1.b);
         this.driverLBump = new Button(() -> gamepad1.left_bumper);
         this.driverRBump = new Button(() -> gamepad1.right_bumper);
+        this.driverResetHeading = new Button(() -> gamepad1.back || gamepad1.options);
 
         //Shooter Button Binding
         this.shooterB = new Button(() -> gamepad2.b);
@@ -47,28 +49,23 @@ public class TeleopController {
         // Handle driver controls
         if (driverA.wasJustPressed()) {            schedule(robot.IntakeManager.toggleIntakeMode);}
         if (driverB.wasJustPressed()) {            schedule(robot.IntakeManager.toggleReverseIntakeMode);}
-        //Slow Mode
-        if (driverLBump.isHeld() || driverRBump.isHeld()) {
-            DrivePowers powers = ManualDrive.fieldCentric(
-                    (0.5 * -gamepad1.left_stick_y),
-                    (0.5 * gamepad1.left_stick_x),
-                    (0.5 * gamepad1.right_stick_x),
-                    follower.pose().heading()
-            );
 
-            follower.manual(powers);
-            follower.update();
-        } else {
-            DrivePowers powers = ManualDrive.fieldCentric(
-                    -gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    gamepad1.right_stick_x,
-                    follower.pose().heading()
-            );
-
-            follower.manual(powers);
-            follower.update();
+        // Reset heading for field-centric mode
+        if (driverResetHeading.wasJustPressed()) {
+            follower.setPose(Pose.zero());
+            headingOffset = follower.pose().heading();
         }
+
+        double scale = (driverLBump.isHeld() || driverRBump.isHeld()) ? 0.5 : 1.0;
+        double forward = scale * -gamepad1.left_stick_y;
+        double lateral = scale * gamepad1.left_stick_x;
+        double turn    = scale * gamepad1.right_stick_x;
+
+        double currentHeading = -(follower.pose().heading() - headingOffset);
+        DrivePowers powers = ManualDrive.fieldCentric(forward, lateral, turn, currentHeading);
+
+        follower.manual(powers);
+        follower.update();
 
 
         // Handle operator/shooter controls
