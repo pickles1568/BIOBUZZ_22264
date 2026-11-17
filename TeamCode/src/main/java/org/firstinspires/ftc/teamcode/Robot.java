@@ -49,7 +49,7 @@ public class Robot {
         PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"));
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
 
-        aimSystem = new AimSystem(hwMap.get(Servo.class, "Swivel"), IsRedAlliance);
+        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), IsRedAlliance);
 
         // Robot level commands
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);

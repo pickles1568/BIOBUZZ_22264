@@ -11,15 +11,15 @@ public class AimSystem {
     public float DistanceToShoot;
     public float ReqRPM;
 
-    Servo Swivel;
-    public AimSystem(Servo Swivel, Boolean IsRedAlliance){
+    CRServo Swivel;
+    public AimSystem(CRServo Swivel, Boolean IsRedAlliance){
         this.Swivel = Swivel;
         this.CanSeeHive = false;
         this.ReqRPM = 0;
     }
 
     public void TurnSwivel(double Pos){
-        Swivel.setPosition(Pos);
+        Swivel.setPower(Pos / 6);
     }
 
     public float CalcRPM(float distance){

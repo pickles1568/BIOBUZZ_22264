@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static com.pedropathing.ivy.Scheduler.schedule;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -34,11 +36,12 @@ public class Demo extends OpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(com.pedropathing.math.Pose.zero());
         controls = new TeleopController(robot, follower, gamepad1, gamepad2);
-        shooterX = new Button(() -> gamepad1.x);
-        shooterY = new Button(() -> gamepad1.y);
-        Turret1 = new Button(() -> gamepad1.dpad_left);
-        Turret2 = new Button(() -> gamepad1.dpad_up);
-        Turret3 = new Button(() -> gamepad1.dpad_right);
+        shooterX = new Button(() -> gamepad2.x);
+        shooterY = new Button(() -> gamepad2.y);
+        shooterA = new Button(() -> gamepad2.a);
+        Turret1 = new Button(() -> gamepad2.dpad_left);
+        Turret2 = new Button(() -> gamepad2.dpad_up);
+        Turret3 = new Button(() -> gamepad2.dpad_right);
     }
 
     @Override
@@ -53,18 +56,28 @@ public class Demo extends OpMode {
         if (shooterY.wasJustPressed()){// STOP
             robot.PollenTurret.Flywheel.setPower(0);
             robot.NectarTurret.Flywheel.setPower(0);
-        }
-        if (Turret1.wasJustPressed()){
-            robot.aimSystem.TurnSwivel(0.45);
-        }
-        if (Turret2.wasJustPressed()){
-            robot.aimSystem.TurnSwivel(0.5);
-        }
-        if (Turret3.wasJustPressed()){
-            robot.aimSystem.TurnSwivel(0.55);
+            schedule(robot.PollenTurret.StopKicking);
+            schedule(robot.NectarTurret.StopKicking);
         }
 
+        if (shooterA.wasJustPressed()){
+            schedule(robot.IntakeManager.toggleIntakeMode);
+            schedule(robot.PollenTurret.StartKicking);
+            schedule(robot.NectarTurret.StartKicking);
+        }
+
+        // We live in a society
+//        if (Turret1.wasJustPressed()){
+//            robot.aimSystem.TurnSwivel(0.45);
+//        }
+//        if (Turret2.wasJustPressed()){
+//            robot.aimSystem.TurnSwivel(0.5);
+//        }
+//        if (Turret3.wasJustPressed()){
+//            robot.aimSystem.TurnSwivel(0.55);
+//        }
+
         Scheduler.execute();
-        robot.update();
+        //robot.update();
     }
 }
