@@ -56,15 +56,21 @@ public class Demo extends OpMode {
         if (shooterY.wasJustPressed()){// STOP
             robot.PollenTurret.Flywheel.setPower(0);
             robot.NectarTurret.Flywheel.setPower(0);
-            schedule(robot.PollenTurret.StopKicking);
-            schedule(robot.NectarTurret.StopKicking);
+            robot.PollenTurret.kicker.setPower(0);
+            robot.NectarTurret.kicker.setPower(0);
+//            schedule(robot.PollenTurret.StopKicking);
+//            schedule(robot.NectarTurret.StopKicking);
         }
 
         if (shooterA.wasJustPressed()){
             schedule(robot.IntakeManager.toggleIntakeMode);
-            schedule(robot.PollenTurret.StartKicking);
-            schedule(robot.NectarTurret.StartKicking);
+//            schedule(robot.PollenTurret.StartKicking);
+//            schedule(robot.NectarTurret.StartKicking);
+            robot.PollenTurret.kicker.setPower(1);
+            robot.NectarTurret.kicker.setPower(1);
         }
+
+
 
         // We live in a society
 //        if (Turret1.wasJustPressed()){

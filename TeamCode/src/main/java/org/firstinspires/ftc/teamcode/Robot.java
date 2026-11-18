@@ -46,8 +46,8 @@ public class Robot {
                 hwMap.get(DcMotor.class, "intake"),
                 hwMap.get(DcMotor.class, "transfer"));
 
-        PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"));
-        NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"));
+        PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"), false);
+        NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"), true);
 
         aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), IsRedAlliance);
 

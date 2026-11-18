@@ -27,6 +27,8 @@ public class TeleopController {
     private final Button shooterLBump;
 
     private double headingOffset = 0.0;
+    private final Button shooterUpDPad;
+    private final Button shooterDownDPad;
 
     public TeleopController(Robot robot, Follower follower, Gamepad gamepad1, Gamepad gamepad2) {
         this.robot = robot;
@@ -43,6 +45,8 @@ public class TeleopController {
         this.shooterB = new Button(() -> gamepad2.b);
         this.shooterRBump = new Button(() -> gamepad2.right_bumper);
         this.shooterLBump = new Button(() -> gamepad2.left_bumper);
+        this.shooterUpDPad = new Button(() -> gamepad2.dpad_up);
+        this.shooterDownDPad = new Button(() -> gamepad2.dpad_down);
     }
 
     public void update(Gamepad gamepad1, Gamepad gamepad2) {
@@ -70,6 +74,8 @@ public class TeleopController {
 
         // Handle operator/shooter controls
         if (shooterB.wasJustPressed()) {           schedule(robot.ToggleShooting);}
+        if (shooterUpDPad.wasJustPressed()){   schedule(robot.PollenTurret.StartKicking , robot.NectarTurret.StartKicking);}
+        if (shooterDownDPad.wasJustPressed()){ schedule(robot.PollenTurret.StopKicking , robot.NectarTurret.StopKicking);}
         //if (shooterRBump.wasJustPressed()){        schedule(robot.StartShooting);}//shooterRightBump
         //if (shooterLBump.wasJustPressed()){        schedule(robot.StopShooting);}
         robot.aimSystem.TurnSwivel(gamepad2.right_stick_x);

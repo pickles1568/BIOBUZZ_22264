@@ -9,6 +9,7 @@ import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.helpers.Button;
@@ -35,9 +36,12 @@ public class Turret {
 
     public boolean IsShooting = false;
 
-    public Turret(DcMotorEx Flywheel, CRServo kicker) {
+    public Turret(DcMotorEx Flywheel, CRServo kicker, boolean isReverse) {
         this.Flywheel = Flywheel;
         this.kicker = kicker;
+        if (isReverse){
+            kicker.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
         lastEncoderPosition = Flywheel.getCurrentPosition();
         Flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
