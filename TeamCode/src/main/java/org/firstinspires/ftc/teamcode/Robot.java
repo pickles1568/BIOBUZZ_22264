@@ -11,6 +11,10 @@ import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.deadline;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
+
+import com.pedropathing.revhub.localizers.Encoder;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -49,7 +53,7 @@ public class Robot {
         PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"), false);
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"), true);
 
-        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), IsRedAlliance);
+        aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), hwMap.get(AnalogInput.class, "SwivelTurn"), hwMap.get(Limelight3A.class, "limelight"), IsRedAlliance);
 
         // Robot level commands
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);
