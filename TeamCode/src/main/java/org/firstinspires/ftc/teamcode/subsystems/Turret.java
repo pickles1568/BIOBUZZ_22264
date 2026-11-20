@@ -129,11 +129,14 @@ public class Turret {
 
     public void setAimRPM(double rpm) { aimRPM = rpm; }
 
+    public double defaultRPM = 1700;   // used when the aim system hasn't given us anything
+
     public double getShootVel() {
-        if (aimRPM <= 0) return highVel;                       // no target, use default
-        double rpm = Math.min(aimRPM, MaxRPM);                 // don't ask for more than the motor can do
-        return rpm * encoderResolutionTPR / 60.0;              // RPM -> ticks/s
+        double rpm = (aimRPM > 0) ? aimRPM : defaultRPM;
+        rpm = Math.min(rpm, MaxRPM);
+        return rpm * encoderResolutionTPR / 60.0;   // RPM -> ticks/s
     }
+
     public void applyShootVel() { //If dist changes while shooting this corrects
         if (IsShooting) curTargetVel = getShootVel();
     }
@@ -233,7 +236,7 @@ public class Turret {
         Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
     }
 
-    public double[] stepSizes = {10.0, 1.0, 0.1, 0.001, 0.0001};
+    public double[] stepSizes = {100.0, 10.0, 1.0, 0.1, 0.001, 0.0001};
     public int stepIndex = 1;
     public void sendTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
         double[] telemData = getTelemData();
