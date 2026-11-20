@@ -41,6 +41,10 @@ public class Robot {
     public Command ToggleKick;
     public Command ToggleForceKick;
 
+    public Servo NectarGate;
+    public  double NectarGateSecondPos= 0.17;
+    public  double NectarGateFirstPos= 0.17;
+
     public HardwareMap hwMap;
 
     public Command ShootForMoment;
@@ -48,6 +52,8 @@ public class Robot {
     public Robot(HardwareMap hwMap, Boolean IsRedAlliance){
         this.IsRedAlliance = IsRedAlliance;
         this.hwMap = hwMap;
+
+        NectarGate = hwMap.get(Servo.class, "nectarGate");
 
         IntakeManager = new IntakeTransferManager(
                 hwMap.get(DcMotor.class, "intake"),
@@ -57,6 +63,8 @@ public class Robot {
         NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"), true);
 
         aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), hwMap.get(AnalogInput.class, "SwivelTurn"), hwMap.get(Limelight3A.class, "limelight"), IsRedAlliance);
+
+
 
         // Robot level commands
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);
@@ -70,9 +78,9 @@ public class Robot {
         );
 
         Command spinUpAll = parallel(PollenTurret.SpinUp, NectarTurret.SpinUp);
-        Command kickAll = parallel(PollenTurret.KickWhenReady, NectarTurret.KickWhenReady, IntakeManager.startTransfer);
-        Command forceKickAll = parallel(PollenTurret.ForceKick, NectarTurret.ForceKick, IntakeManager.startTransfer);
-        Command stopKickAll = parallel(PollenTurret.StopKicking, NectarTurret.StopKicking, IntakeManager.stopTraransfer);
+        Command kickAll = parallel(PollenTurret.KickWhenReady, NectarTurret.KickWhenReady, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
+        Command forceKickAll = parallel(PollenTurret.ForceKick, NectarTurret.ForceKick, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
+        Command stopKickAll = parallel(PollenTurret.StopKicking, NectarTurret.StopKicking, IntakeManager.stopTraransfer, instant(() -> {NectarGate.setPosition(NectarGateFirstPos);}));
 
         // B: spin up, or stop flywheel AND kicker
         ToggleSpinUp = conditional(() -> PollenTurret.IsShooting, StopShooting, spinUpAll);
@@ -82,7 +90,7 @@ public class Robot {
                 () -> PollenTurret.IsKicking || PollenTurret.KickRequested,
                 stopKickAll, kickAll);
 
-        // Back: failsafe raw kick toggle
+        // Back: failsafe raw kick toggle,
         ToggleForceKick = conditional(() -> PollenTurret.IsKicking, stopKickAll, forceKickAll);
     }
     public Robot(HardwareMap hwMap) {this(hwMap, true);} //if no boolean passed in assume true
