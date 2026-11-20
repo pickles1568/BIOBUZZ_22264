@@ -42,4 +42,11 @@ public class IntakeTransferManager {
             ReveseIntake
     ).requiring(Intake, Transfer);
 
+    public Command startTransfer = instant(() -> {
+        Transfer.setPower(1);
+    });
+    public Command stopTraransfer = instant(() -> {
+        Transfer.setPower(0);
+    });
+
 }

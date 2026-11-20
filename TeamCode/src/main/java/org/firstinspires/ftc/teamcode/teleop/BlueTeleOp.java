@@ -32,13 +32,33 @@ public class BlueTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        Scheduler.execute();
+        robot.update();
+
+        double targetTicks = robot.PollenTurret.curTargetVel;
+        double actualTicks = robot.PollenTurret.Flywheel.getVelocity();
+        telemetry.addLine("Pollen shooter:");
+        telemetry.addData("Target (ticks/s)", targetTicks);
+        telemetry.addData("Actual (ticks/s)", actualTicks);
+        telemetry.addData("Target RPM", targetTicks * 60.0 / 28.0);
+        telemetry.addData("Actual RPM", actualTicks * 60.0 / 28.0);
+
+
+        double NtargetTicks = robot.NectarTurret.curTargetVel;
+        double NactualTicks = robot.NectarTurret.Flywheel.getVelocity();
+        telemetry.addLine("Pollen shooter:");
+        telemetry.addData("Target (ticks/s)", NtargetTicks);
+        telemetry.addData("Actual (ticks/s)", NactualTicks);
+        telemetry.addData("Target RPM", NtargetTicks * 60.0 / 28.0);
+        telemetry.addData("Actual RPM", NactualTicks * 60.0 / 28.0);
+
 
         controls.update(gamepad1, gamepad2);
 
-        telemetry.addData("Speed", robot.PollenTurret.getRPM());
-        telemetry.addData("Target", robot.PollenTurret.curTargetVel);
+        telemetry.addLine("Aiming data:");
+        telemetry.addData("Angle",robot.aimSystem.getTurretCurrentDegrees());
+        telemetry.addData("Error", robot.aimSystem.getError());
 
-        Scheduler.execute();
-        robot.update();
+        telemetry.update();
     }
 }

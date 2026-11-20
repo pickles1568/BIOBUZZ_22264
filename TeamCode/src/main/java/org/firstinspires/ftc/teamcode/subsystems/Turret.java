@@ -5,15 +5,18 @@ import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.bylazar.configurables.annotations.Configurable;
 
 import org.firstinspires.ftc.teamcode.helpers.Button;
 
+@Configurable
 public class Turret {
 
     final double encoderResolutionTPR = 28.0;
@@ -26,13 +29,13 @@ public class Turret {
     double lastEncoderPosition;
     long lastTimeNano;
 
-    public double highVel = 1000;
+    public double highVel = 1700;
     public double lowVel = 100;
 
     // Made public so the tuner OpMode can display them in telemetry
     public double curTargetVel = 0;
-    public double F = 10.0;
-    public double P = 10.0;
+    public static double F = 10.0;
+    public static double P = 10.0;
 
     public boolean IsShooting = false;
 
@@ -91,11 +94,11 @@ public class Turret {
 
     double CurVel;
     double Error;
-    double tolerance = 100;
+    double tolerance = 50;
 
     public Command DoFlywheel = Command.build()
             .setStart(() -> {
-                curTargetVel = highVel;
+                curTargetVel = getShootVel();
                 updateVel();
             })
             .setExecute(() -> {
@@ -110,7 +113,7 @@ public class Turret {
 
     public Command RunFlywheel = Command.build()
             .setStart(() -> {
-                curTargetVel = highVel;
+                curTargetVel = getShootVel();
             })
             .setExecute(() -> {
                 updateVel();
@@ -121,7 +124,7 @@ public class Turret {
 
 
     //slop slop slop
-    // RPM requested by the aim system. 0 means "Idk", so highVel.
+    // RPM requested by the aim system. 0 means "   Idk", so highVel.
     public double aimRPM = 0;
 
     public void setAimRPM(double rpm) { aimRPM = rpm; }
@@ -140,9 +143,41 @@ public class Turret {
 
     public Command StopFlywheel = instant(() -> { curTargetVel = 0; IsShooting = false; });
 
+//New code
+    public boolean IsKicking = false;
+    public boolean KickRequested = false;   // true while a kick is queued or running
 
-    public Command StartKicking = instant(() -> { if (IsShooting) kicker.setPower(1); }).requiring(kicker);
-    public Command StopKicking  = instant(() -> kicker.setPower(0)).requiring(kicker);
+    public Command StartKicking = instant(() -> {
+        if (IsShooting) { kicker.setPower(1); IsKicking = true; }
+    }).requiring(kicker);
+
+    public Command StopKicking = instant(() -> {
+        kicker.setPower(0);
+        IsKicking = false;
+        KickRequested = false;
+    }).requiring(kicker);
+
+    public boolean atSpeed() {
+        return IsShooting && curTargetVel > 0
+                && Math.abs(curTargetVel - Flywheel.getVelocity()) <= tolerance;
+    }
+
+    // Used by the X toggle: queue a kick, wait for speed, then kick (unless cancelled)
+    public Command WaitUntilAtSpeed = Command.build()
+            .setExecute(() -> {})
+            .setDone(() -> !IsShooting || !KickRequested || atSpeed());
+
+    public Command KickIfRequested = instant(() -> {
+        if (IsShooting && KickRequested) { kicker.setPower(1); IsKicking = true; }
+    }).requiring(kicker);
+
+    public Command KickWhenReady = sequential(
+            instant(() -> KickRequested = true),
+            WaitUntilAtSpeed,
+            KickIfRequested);
+
+    // Failsafe: kicks no matter what (ignores speed and IsShooting)
+    public Command ForceKick = instant(() -> { kicker.setPower(1); IsKicking = true; }).requiring(kicker);
 
 
     public Command WaitForSpeed = Command.build()
@@ -151,7 +186,6 @@ public class Turret {
 
     public Command StartShooting = sequential(SpinUp, WaitForSpeed, StartKicking);
     public Command StopShooting  = parallel(StopFlywheel, StopKicking);
-
 
 
     public void testSpinUp(){

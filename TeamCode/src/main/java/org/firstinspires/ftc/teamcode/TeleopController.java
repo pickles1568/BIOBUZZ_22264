@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 
+
 import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
@@ -29,6 +30,8 @@ public class TeleopController {
     private double headingOffset = 0.0;
     private final Button shooterUpDPad;
     private final Button shooterDownDPad;
+    private final Button shooterX;
+    private final Button shooterBack;
 
     public TeleopController(Robot robot, Follower follower, Gamepad gamepad1, Gamepad gamepad2) {
         this.robot = robot;
@@ -47,6 +50,8 @@ public class TeleopController {
         this.shooterLBump = new Button(() -> gamepad2.left_bumper);
         this.shooterUpDPad = new Button(() -> gamepad2.dpad_up);
         this.shooterDownDPad = new Button(() -> gamepad2.dpad_down);
+        this.shooterX = new Button(() -> gamepad2.x);
+        this.shooterBack = new Button(() -> gamepad2.back);
     }
 
     public void update(Gamepad gamepad1, Gamepad gamepad2) {
@@ -73,11 +78,9 @@ public class TeleopController {
 
 
         // Handle operator/shooter controls
-        if (shooterB.wasJustPressed()) {           schedule(robot.ToggleShooting);}
-        if (shooterUpDPad.wasJustPressed()){   schedule(robot.PollenTurret.StartKicking , robot.NectarTurret.StartKicking);}
-        if (shooterDownDPad.wasJustPressed()){ schedule(robot.PollenTurret.StopKicking , robot.NectarTurret.StopKicking);}
-        //if (shooterRBump.wasJustPressed()){        schedule(robot.StartShooting);}//shooterRightBump
-        //if (shooterLBump.wasJustPressed()){        schedule(robot.StopShooting);}
-        robot.aimSystem.TurnSwivel(gamepad2.right_stick_x);
+        robot.aimSystem.manualInfluence = gamepad2.left_stick_x;
+        if (shooterB.wasJustPressed())    schedule(robot.ToggleSpinUp);
+        if (shooterX.wasJustPressed())    schedule(robot.ToggleKick);
+        if (shooterBack.wasJustPressed()) schedule(robot.ToggleForceKick);
     }
 }

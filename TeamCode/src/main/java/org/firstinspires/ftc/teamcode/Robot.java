@@ -37,6 +37,9 @@ public class Robot {
     public Command ToggleShooting;
     public Command StartShooting;
     public Command StopShooting;
+    public Command ToggleSpinUp;
+    public Command ToggleKick;
+    public Command ToggleForceKick;
 
     public HardwareMap hwMap;
 
@@ -61,10 +64,26 @@ public class Robot {
         ToggleShooting = conditional(() -> PollenTurret.IsShooting, StopShooting, StartShooting);
 
         Command ShootForMoment = sequential(
-                StopShooting,
+                StartShooting,
                 waitMs(500),
                 StopShooting
         );
+
+        Command spinUpAll = parallel(PollenTurret.SpinUp, NectarTurret.SpinUp);
+        Command kickAll = parallel(PollenTurret.KickWhenReady, NectarTurret.KickWhenReady, IntakeManager.startTransfer);
+        Command forceKickAll = parallel(PollenTurret.ForceKick, NectarTurret.ForceKick, IntakeManager.startTransfer);
+        Command stopKickAll = parallel(PollenTurret.StopKicking, NectarTurret.StopKicking, IntakeManager.stopTraransfer);
+
+        // B: spin up, or stop flywheel AND kicker
+        ToggleSpinUp = conditional(() -> PollenTurret.IsShooting, StopShooting, spinUpAll);
+
+        // X: start a (speed-gated) kick, or stop kicking / cancel a queued kick
+        ToggleKick = conditional(
+                () -> PollenTurret.IsKicking || PollenTurret.KickRequested,
+                stopKickAll, kickAll);
+
+        // Back: failsafe raw kick toggle
+        ToggleForceKick = conditional(() -> PollenTurret.IsKicking, stopKickAll, forceKickAll);
     }
     public Robot(HardwareMap hwMap) {this(hwMap, true);} //if no boolean passed in assume true
 

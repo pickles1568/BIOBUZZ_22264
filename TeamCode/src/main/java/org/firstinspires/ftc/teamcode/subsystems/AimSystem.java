@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -8,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 
+@Configurable
 public class AimSystem {
 
     //EXPORTS
@@ -16,14 +18,17 @@ public class AimSystem {
     public float DistanceToShoot;
     public float ReqRPM;
 
-    private static final double minAngle = -180;
-    private static final double maxAngle = 180;
-    private static final double KP = 0.02;
+    private static final double minAngle = 0;
+    private static final double maxAngle = 350;
+    private static final double offset = 0;
+    private static double KP = 0.025;
 
     private static final int RedPipeline = 1;
-    private static final int BluePipeline = 1;
+    private static final int BluePipeline = 0;
 
-    private static final double gearRatio = 5.0; // 5 Servo rotations : 1 Turret rotation
+    public double manualInfluence = 0;
+
+    private static final double gearRatio = 2.5; // 5 Servo rotations : 1 Turret rotation
 
     CRServo Swivel;
     AnalogInput SwivelEncoder;
@@ -34,8 +39,8 @@ public class AimSystem {
         this.LimeLight = LimeLight;
 
         this.CanSeeHive = false;
-        this.ReqRPM = 0;
-
+        this.ReqRPM = 1750;
+        LimeLight.start();
         setAlliancePipeline(IsRedAlliance);
     }
 
@@ -48,34 +53,38 @@ public class AimSystem {
     public double getTurretCurrentDegrees() {
         double voltage = SwivelEncoder.getVoltage();
         double maxVoltage = SwivelEncoder.getMaxVoltage();
-        double turretDegrees = (voltage / maxVoltage) * 360.0;
+        double turretDegrees = ((voltage / maxVoltage) * 360.0) + offset;
 
         return turretDegrees;
     }
 
-
-    public void update() {
+    public  double getError(){
         LLResult result = LimeLight.getLatestResult();
 
         if (result != null && result.isValid()) {
+            return result.getTx();
+        }
+        else{return -1;}
+    }
+
+
+    public void update() {
+
+        LLResult result = LimeLight.getLatestResult();
+
+        double swivelPower =0;
+
+        if (result != null && result.isValid()) {
             CanSeeHive = true;
+            result.getTx();
             double tx = result.getTx(); // Horizontal offset from target
 
             DistanceToShoot = (float) result.getTa(); //How big is it??? basically distance
 
             double error = tx;
-            double swivelPower = error * KP;
+            swivelPower = error * KP;
 
             // Enforce Software Limits
-            double currentDegrees = getTurretCurrentDegrees();
-            if (currentDegrees >= maxAngle && swivelPower > 0) {
-                swivelPower = 0.0;
-            } else if (currentDegrees <= minAngle && swivelPower < 0) {
-                swivelPower = 0.0;
-            }
-
-            TurnSwivel(swivelPower);
-
             ReqRPM = CalcRPM(DistanceToShoot);
         } else {
             CanSeeHive = false;
@@ -83,6 +92,16 @@ public class AimSystem {
             //AngleToShoot = 0;
             TurnSwivel(0.0); // Stop swivel if target is lost
         }
+
+        swivelPower += manualInfluence;
+
+        double currentDegrees = getTurretCurrentDegrees();
+        if (currentDegrees >= maxAngle && swivelPower > 0) {
+            swivelPower = 0.0;
+        } else if (currentDegrees <= minAngle && swivelPower < 0) {
+            swivelPower = 0.0;
+        }
+        TurnSwivel(swivelPower);
     }
 
 
@@ -91,7 +110,7 @@ public class AimSystem {
     }
 
     public float CalcRPM(float distance){
-        return distance * 2;   // TODO - replace w/ Trey's math
+        return 1700;   // TODO - replace w/ Trey's math
     }
 
 
