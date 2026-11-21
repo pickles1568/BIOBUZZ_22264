@@ -63,10 +63,14 @@ public class RedAuto extends LinearOpMode {
         follower.update();
         robot.update();
 
+
         waitForStart();
         schedule(autoRoutine());
 
         while (opModeIsActive()) {
+
+            robot.update();
+
             follower.update();
             Scheduler.execute();
 

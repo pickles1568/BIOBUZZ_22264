@@ -41,15 +41,24 @@ public class BlueAuto extends LinearOpMode {
     // Autonomous routine
     public Command autoRoutine() {
         return sequential(
-                follow(follower, pollen1()),
                 robot.ShootForMoment,
+
+                follow(follower, pollen1()),
+                waitMs((long) 500),
                 follow(follower, align()),
+                waitMs((long) 500),
+
                 robot.IntakeManager.StartCollecting,
                 follow(follower, intake()),
+                waitMs((long) 500),
                 robot.IntakeManager.StopCollecting,
+
                 follow(follower, pollen2()),
+                waitMs((long) 500),
                 robot.ShootForMoment,
-                follow(follower, park())
+
+                follow(follower, park()),
+                waitMs((long) 500)
         );
     }
 

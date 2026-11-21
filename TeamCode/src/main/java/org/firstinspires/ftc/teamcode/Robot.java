@@ -11,6 +11,7 @@ import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.deadline;
 import static com.pedropathing.ivy.groups.Groups.parallel;
+import static com.pedropathing.ivy.groups.Groups.race;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.pedropathing.revhub.localizers.Encoder;
@@ -75,9 +76,13 @@ public class Robot {
         StopShooting  = parallel(PollenTurret.StopShooting,  NectarTurret.StopShooting);
         ToggleShooting = conditional(() -> PollenTurret.IsShooting, StopShooting, StartShooting);
 
-        Command ShootForMoment = sequential(
-                StartShooting,
-                waitMs(500),
+        ShootForMoment = sequential(
+                parallel(PollenTurret.SpinUp, NectarTurret.SpinUp),
+                race(
+                        parallel(PollenTurret.WaitForSpeed, NectarTurret.WaitForSpeed),
+                        waitMs((long) 500)),      // moves on at speed, or after the timeout
+                parallel(PollenTurret.StartKicking, NectarTurret.StartKicking),
+                waitMs(1500),                                  // time to feed the balls, tune this
                 StopShooting
         );
 
