@@ -57,6 +57,7 @@ public class Robot {
         this.hwMap = hwMap;
 
         NectarGate = hwMap.get(Servo.class, "nectarGate");
+        NectarGate.setPosition(NectarGateFirstPos);
 
         IntakeManager = new IntakeTransferManager(
                 hwMap.get(DcMotor.class, "intake"),
