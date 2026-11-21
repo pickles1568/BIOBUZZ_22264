@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.subsystems.AimSystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeTransferManager;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
+@Configurable
 public class Robot {
     Boolean IsRedAlliance;
 
@@ -45,6 +47,7 @@ public class Robot {
     public  double NectarGateSecondPos= 0.3;
     public  double NectarGateFirstPos= 0.1;
 
+    public static  double StartingAngle = 10;
     public HardwareMap hwMap;
 
     public Command ShootForMoment;
@@ -64,7 +67,7 @@ public class Robot {
 
         aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), hwMap.get(AnalogInput.class, "SwivelTurn"), hwMap.get(Limelight3A.class, "limelight"), IsRedAlliance);
 
-
+        aimSystem.setStartAngle(StartingAngle);
 
         // Robot level commands
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);

@@ -18,10 +18,9 @@ public class AimSystem {
     // ---- Tunables (Panels can edit these live) ----
     public static double encoderRangeDeg = 180;  // servo-shaft degrees covered by one full 0-3.3V sweep (Axon wraps every 180)
     public static double gearRatio = 2.5;        // servo SHAFT rotations per 1 turret rotation (5 encoder wraps per turret turn)
-    public static double startAngle = 0;         // turret angle (deg) when the robot is initialised
-    public static double encoderDirection = 1;   // set to -1 if the angle counts down when the turret turns "positive"
-    public static double minAngle = 0;
-    public static double maxAngle = 350;
+    public static double encoderDirection = -1;   // set to -1 if the angle counts down when the turret turns "positive"
+    public static double minAngle = -145;
+    public static double maxAngle = 35;
     public static double KP = 0.025;
 
     // Flip tuning
@@ -94,10 +93,14 @@ public class AimSystem {
         unwrappedServoDeg += delta;
         lastRawServoDeg = raw;
     }
+    // AimSystem
+    public static double savedAngle = 0;   // survives between OpModes (static)
+    private double startOffsetDeg = 0;
 
-    // ignores wrapping
+    public void setStartAngle(double deg) { startOffsetDeg = deg; }
+
     public double getTurretCurrentDegrees() {
-        return startAngle + encoderDirection * (unwrappedServoDeg - servoDegAtStart) / gearRatio;
+        return startOffsetDeg + encoderDirection * (unwrappedServoDeg - servoDegAtStart) / gearRatio;
     }
 
     public double getError(){

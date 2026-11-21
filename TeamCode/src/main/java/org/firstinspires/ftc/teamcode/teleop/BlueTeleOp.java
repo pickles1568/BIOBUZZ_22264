@@ -59,6 +59,9 @@ public class BlueTeleOp extends OpMode {
         telemetry.addData("Angle",robot.aimSystem.getTurretCurrentDegrees());
         telemetry.addData("Error", robot.aimSystem.getError());
 
+        telemetry.addData("Min Limit", robot.aimSystem.minAngle);
+        telemetry.addData("Max limit", robot.aimSystem.maxAngle);
+
         telemetry.update();
     }
 }
