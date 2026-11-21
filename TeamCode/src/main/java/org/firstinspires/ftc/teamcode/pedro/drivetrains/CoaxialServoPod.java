@@ -177,10 +177,10 @@ public class CoaxialServoPod implements SwervePod {
             finalDrivePower = -drivePower;
         }
 
-        // Scale drive power if the servo is still turning towards targetPos
-        double posError = Math.abs(targetPos - clampedCurrentPos);
-        double alignmentScale = Math.max(0.0, 1.0 - (posError * 4.0));
-        finalDrivePower *= alignmentScale;
+        // Drive power scaling removed to prevent pre-stop pulsing/jitter
+        // double posError = Math.abs(targetPos - clampedCurrentPos);
+        // double alignmentScale = Math.max(0.0, 1.0 - (posError * 4.0));
+        // finalDrivePower *= alignmentScale;
 
         //Update hardware with caching thresholds
         double servoCachingThreshold = config.servoCachingThreshold.get();

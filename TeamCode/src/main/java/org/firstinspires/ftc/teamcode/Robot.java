@@ -42,8 +42,8 @@ public class Robot {
     public Command ToggleForceKick;
 
     public Servo NectarGate;
-    public  double NectarGateSecondPos= 0.17;
-    public  double NectarGateFirstPos= 0.17;
+    public  double NectarGateSecondPos= 0.3;
+    public  double NectarGateFirstPos= 0.1;
 
     public HardwareMap hwMap;
 

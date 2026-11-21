@@ -65,10 +65,10 @@ public class TeleopController {
             headingOffset = follower.pose().heading();
         }
 
-        double scale = (driverLBump.isHeld() || driverRBump.isHeld()) ? 0.5 : 1.0;
-        double forward = scale * -gamepad1.left_stick_y;
-        double lateral = scale * gamepad1.left_stick_x;
-        double turn    = scale * gamepad1.right_stick_x;
+        double teleopScale = (driverLBump.isHeld() || driverRBump.isHeld()) ? 1.0 : 2.0;
+        double forward = teleopScale * -gamepad1.left_stick_y;
+        double lateral = teleopScale * gamepad1.left_stick_x;
+        double turn    = teleopScale * -gamepad1.right_stick_x;
 
         double currentHeading = -(follower.pose().heading() - headingOffset);
         DrivePowers powers = ManualDrive.fieldCentric(forward, lateral, turn, currentHeading);

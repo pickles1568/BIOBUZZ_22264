@@ -3,9 +3,13 @@ package org.firstinspires.ftc.teamcode.pedro;
 import com.pedropathing.algorithm.Foresight;
 import com.pedropathing.algorithm.ForesightConfig;
 import com.pedropathing.controllers.Controller;
+import com.pedropathing.drivetrain.DrivePowers;
+import com.pedropathing.drivetrain.Drivetrain;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Matrix;
 import com.pedropathing.math.Vector2D;
+
+import java.util.Map;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.pedro.drivetrains.CoaxialServoPod;
@@ -36,40 +40,41 @@ public class Constants {
             }
     );
 
+
     public static PinpointConfig localizerConfig = new PinpointConfig(c -> {
         c.name.set("pinpoint");
         c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        c.xPodOffset.set(6.886046402097687);
-        c.yPodOffset.set(-1.2856627637007108);
+        c.xPodOffset.set(4.1857765978715555);
+        c.yPodOffset.set(2.341121613510012);
         c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
         c.globalDistanceUnit.set(DistanceUnit.INCH);
         c.offsetUnits.set(DistanceUnit.INCH);
     });
 
     public static ForesightConfig foresightConfig = new ForesightConfig(
             c -> {
-                Controller primaryTranslationalForward = Controller.proportional(0.22828204987793282);
-                Controller secondaryTranslationalForward = Controller.proportional(0.08434411762118167);
-                Controller primaryTranslationalLateral = Controller.proportional(0.22430787216827477);
-                Controller secondaryTranslationalLateral = Controller.proportional(0.08287576514944717);
+                Controller primaryTranslationalForward = Controller.proportional(0.03);
+                Controller secondaryTranslationalForward = Controller.proportional(0.03);
+                Controller primaryTranslationalLateral = Controller.proportional(0.03);
+                Controller secondaryTranslationalLateral = Controller.proportional(0.03);
 
                 c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
                 c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
 
-                c.coast.set(Controller.proportionalFeedforward(0.013964598237654969));
-                c.brake.set(Controller.proportionalFeedforward(0.011869908502006723));
+                c.coast.set(Controller.proportionalFeedforward(0.04));
+                c.brake.set(Controller.proportionalFeedforward(0.04));
 
-                c.headingFeedback.set(Controller.proportional(5.302184006839192));
-                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.056420115112856765, 0.0457850918140785));
+                c.headingFeedback.set(Controller.proportional(3.2));
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.0564, 0.0458));
 
-                c.linearBrakeCoefficients.set(Matrix.diag(0.019325492975165833, 0.0714093891969658));
-                c.quadraticBrakeCoefficients.set(Matrix.diag(0.002215530772017073, 0.0010117428843690415));
+                c.linearBrakeCoefficients.set(Matrix.diag(0.0303, 0.0714));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.0020, 0.0010));
 
-                c.maxAchievableForwardVelocity.set(78.12764252314517);
-                c.maxAchievableStrafeVelocity.set(77.6455907285766);
-                c.naturalForwardDeceleration.set(55.702121806916466);
-                c.naturalStrafeDeceleration.set(56.430072438593356);
+                c.maxAchievableForwardVelocity.set(25.0);
+                c.maxAchievableStrafeVelocity.set(25.0);
+                c.naturalForwardDeceleration.set(30.0);
+                c.naturalStrafeDeceleration.set(30.0);
             }
     );
 
@@ -157,8 +162,10 @@ public class Constants {
             }
     );
 
-    public static Swerve createDrivetrain(HardwareMap hardwareMap) {
-        return new Swerve(
+    public static double globalSpeedScale = 0.5; // Full match speed for autonomous & teleop
+
+    public static Drivetrain createDrivetrain(HardwareMap hardwareMap) {
+        Swerve swerve = new Swerve(
                 hardwareMap,
                 driveConfig,
                 new CoaxialServoPod(hardwareMap, leftFront),
@@ -166,6 +173,44 @@ public class Constants {
                 new CoaxialServoPod(hardwareMap, leftBack),
                 new CoaxialServoPod(hardwareMap, rightBack)
         );
+        return new Drivetrain() {
+            @Override
+            public void drive(DrivePowers powers, boolean manual) {
+                swerve.drive(new DrivePowers(
+                        powers.forward() * globalSpeedScale,
+                        powers.strafe() * globalSpeedScale,
+                        -powers.turn() * globalSpeedScale
+                ), manual);
+            }
+
+            @Override
+            public double maxScaling(DrivePowers current, DrivePowers delta) {
+                return swerve.maxScaling(
+                        new DrivePowers(current.forward() * globalSpeedScale, current.strafe() * globalSpeedScale, -current.turn() * globalSpeedScale),
+                        new DrivePowers(delta.forward() * globalSpeedScale, delta.strafe() * globalSpeedScale, -delta.turn() * globalSpeedScale)
+                );
+            }
+
+            @Override
+            public void stop() {
+                swerve.stop();
+            }
+
+            @Override
+            public void stop(boolean brake) {
+                swerve.stop(brake);
+            }
+
+            @Override
+            public Map<String, Object> debug() {
+                return swerve.debug();
+            }
+
+            @Override
+            public double interpolateVelocity(double xRadius, double yRadius, double theta) {
+                return swerve.interpolateVelocity(xRadius, yRadius, theta);
+            }
+        };
     }
 
     public static Follower create(HardwareMap hardwareMap) {
