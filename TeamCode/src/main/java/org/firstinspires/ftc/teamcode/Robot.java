@@ -64,8 +64,8 @@ public class Robot {
                 hwMap.get(DcMotor.class, "intake"),
                 hwMap.get(DcMotor.class, "transfer"));
 
-        PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"), false);
-        NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"), true);
+        PollenTurret = new Turret(hwMap.get(DcMotorEx.class, "PollenTurret"), hwMap.get(CRServo.class, "pollenKicker"), false, 3350);
+        NectarTurret = new Turret(hwMap.get(DcMotorEx.class, "NectarTurret"), hwMap.get(CRServo.class, "nectarKicker"), true, 3550);
 
         aimSystem = new AimSystem(hwMap.get(CRServo.class, "Swivel"), hwMap.get(AnalogInput.class, "SwivelTurn"), hwMap.get(Limelight3A.class, "limelight"), IsRedAlliance);
 
@@ -80,7 +80,7 @@ public class Robot {
                 parallel(PollenTurret.SpinUp, NectarTurret.SpinUp),
                 race(
                         parallel(PollenTurret.WaitForSpeed, NectarTurret.WaitForSpeed),
-                        waitMs((long) 500)),      // moves on at speed, or after the timeout
+                        waitMs((long) 10000)),      // moves on at speed, or after the timeout
                 parallel(PollenTurret.StartKicking, NectarTurret.StartKicking),
                 waitMs(1500),                                  // time to feed the balls, tune this
                 StopShooting

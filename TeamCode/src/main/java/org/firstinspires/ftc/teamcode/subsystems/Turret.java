@@ -5,6 +5,7 @@ import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import com.bylazar.battery.PanelsBattery;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -13,35 +14,41 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.bylazar.configurables.annotations.Configurable;
-
+import com.bylazar.panels.Panels;
+import com.bylazar.telemetry.PanelsTelemetry;
 import org.firstinspires.ftc.teamcode.helpers.Button;
 
 @Configurable
 public class Turret {
 
+    public double defaultRPM = 3400;   // USED ALWAYS IN CURRENT CODE
+
     final double encoderResolutionTPR = 28.0;
     final double MaxRPM = 6000;
 
     public DcMotorEx Flywheel;
+    private PanelsTelemetry panelsTelemetry = PanelsTelemetry.INSTANCE;
 
     public CRServo kicker;
 
     double lastEncoderPosition;
     long lastTimeNano;
 
-    public double highVel = 1700;
+    public double highVel = 6000;
     public double lowVel = 100;
 
     // Made public so the tuner OpMode can display them in telemetry
     public double curTargetVel = 0;
-    public static double F = 10.0;
-    public static double P = 10.0;
+    public static double F = 11.0;
+    public static double P = 70.0;
 
     public boolean IsShooting = false;
 
-    public Turret(DcMotorEx Flywheel, CRServo kicker, boolean isReverse) {
+    public Turret(DcMotorEx Flywheel, CRServo kicker, boolean isReverse, double defaultRPM) {
         this.Flywheel = Flywheel;
         this.kicker = kicker;
+        this.defaultRPM = defaultRPM;
+
         if (isReverse){
             kicker.setDirection(DcMotorSimple.Direction.REVERSE);
         }
@@ -129,10 +136,10 @@ public class Turret {
 
     public void setAimRPM(double rpm) { aimRPM = rpm; }
 
-    public double defaultRPM = 1700;   // used when the aim system hasn't given us anything
+
 
     public double getShootVel() {
-        double rpm = (aimRPM > 0) ? aimRPM : defaultRPM;
+        double rpm = defaultRPM; //(aimRPM > 0) ? aimRPM : defaultRPM;
         rpm = Math.min(rpm, MaxRPM);
         return rpm * encoderResolutionTPR / 60.0;   // RPM -> ticks/s
     }

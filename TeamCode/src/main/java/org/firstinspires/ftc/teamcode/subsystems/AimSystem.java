@@ -21,12 +21,12 @@ public class AimSystem {
     public static double encoderDirection = -1;   // set to -1 if the angle counts down when the turret turns "positive"
     public static double minAngle = -145;
     public static double maxAngle = 35;
-    public static double KP = 0.025;
+    public static double KP = 0.0125;
 
     // Flip tuning
     public static double limitMargin = 2;        // deg from a limit that counts as "at the limit"
     public static double flipTxThreshold = 5;    // deg of tx pushing into a limit before we flip
-    public static double flipKP = 0.01;
+    public static double flipKP = 0.005;
     public static double flipMaxPower = 0.8;
     public static double flipMinPower = 0.08;    // so the CR servo still moves near the end of the sweep
     public static double flipTolerance = 5;      // deg
@@ -61,7 +61,7 @@ public class AimSystem {
         this.LimeLight = LimeLight;
 
         this.CanSeeHive = false;
-        this.ReqRPM = 1750;
+        this.ReqRPM = 0;// this is what always defines speed
 
         lastRawServoDeg = readRawServoDeg();
         unwrappedServoDeg = lastRawServoDeg;
@@ -148,7 +148,7 @@ public class AimSystem {
             lastSeenNano = System.nanoTime();
 
             swivelPower = tx * KP;
-            ReqRPM = CalcRPM(DistanceToShoot);
+            ReqRPM = 3200;//CalcRPM(DistanceToShoot); //NEVER USED IN CURRENT CODE
 
             // Pinned at a limit and the target is still beyond it -> flip around
             if (tryStartFlip(current, tx)) {

@@ -25,7 +25,8 @@ public class IntakeTransferManager {
 
     public Command StartCollecting = instant(() -> {Intake.setPower(1); Transfer.setPower(1); Collecting = true; Expelling = false;}).requiring(Intake, Transfer);
     public Command StopCollecting = instant(() -> {Intake.setPower(0); Transfer.setPower(0); Collecting = false; Expelling = false;}).requiring(Intake, Transfer);
-    Command ReveseIntake = instant(() -> {Intake.setPower(-1); Transfer.setPower(-1); Collecting = false; Expelling = true;});
+    Command ReveseIntakeAndTransfer = instant(() -> {Intake.setPower(-1); Transfer.setPower(-1); Collecting = false; Expelling = true;});
+    Command ReveseIntake = instant(() -> {Intake.setPower(-1); Collecting = false; Expelling = true;});
 
     Command ActivateTransfer = instant(() -> {Transfer.setPower(1);}).requiring(Transfer);
     Command StopTransfer = instant(() -> {Transfer.setPower(0);}).requiring(Transfer);
@@ -36,10 +37,17 @@ public class IntakeTransferManager {
             StartCollecting
     ).requiring(Intake, Transfer);
 
-    public Command toggleReverseIntakeMode = conditional(
+    public Command toggleReverseIntake = conditional(
             () -> Expelling,
             StopCollecting,
             ReveseIntake
+    ).requiring(Intake);
+
+
+    public Command toggleReverseIntakeMode = conditional(
+            () -> Expelling,
+            StopCollecting,
+            ReveseIntakeAndTransfer
     ).requiring(Intake, Transfer);
 
     public Command startTransfer = instant(() -> {
