@@ -67,12 +67,13 @@ public class SimpleBlue extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
         follower.update();
-        robot.update();
+        //robot.update();
 
         waitForStart();
         schedule(autoRoutine());
 
         while (opModeIsActive()) {
+
 
             robot.update();
             follower.update();

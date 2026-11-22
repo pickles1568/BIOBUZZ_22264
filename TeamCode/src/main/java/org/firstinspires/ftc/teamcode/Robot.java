@@ -72,6 +72,14 @@ public class Robot {
         aimSystem.setStartAngle(StartingAngle);
 
         // Robot level commands
+
+
+        Command spinUpAll = parallel(PollenTurret.SpinUp, NectarTurret.SpinUp);
+        Command kickAll = parallel(PollenTurret.KickWhenReady, NectarTurret.KickWhenReady, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
+        Command forceKickAll = parallel(PollenTurret.ForceKick, NectarTurret.ForceKick, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
+        Command stopKickAll = parallel(PollenTurret.StopKicking, NectarTurret.StopKicking, IntakeManager.stopTraransfer, instant(() -> {NectarGate.setPosition(NectarGateFirstPos);}));
+
+
         StartShooting = parallel(PollenTurret.StartShooting, NectarTurret.StartShooting);
         StopShooting  = parallel(PollenTurret.StopShooting,  NectarTurret.StopShooting);
         ToggleShooting = conditional(() -> PollenTurret.IsShooting, StopShooting, StartShooting);
@@ -80,16 +88,12 @@ public class Robot {
                 parallel(PollenTurret.SpinUp, NectarTurret.SpinUp),
                 race(
                         parallel(PollenTurret.WaitForSpeed, NectarTurret.WaitForSpeed),
-                        waitMs((long) 10000)),      // moves on at speed, or after the timeout
-                parallel(PollenTurret.StartKicking, NectarTurret.StartKicking),
+                        waitMs((long) 5000)),      // moves on at speed, or after the timeout
+                parallel(kickAll),
                 waitMs(1500),                                  // time to feed the balls, tune this
-                StopShooting
+                StopShooting, stopKickAll
         );
 
-        Command spinUpAll = parallel(PollenTurret.SpinUp, NectarTurret.SpinUp);
-        Command kickAll = parallel(PollenTurret.KickWhenReady, NectarTurret.KickWhenReady, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
-        Command forceKickAll = parallel(PollenTurret.ForceKick, NectarTurret.ForceKick, IntakeManager.startTransfer, instant(() -> {NectarGate.setPosition(NectarGateSecondPos);}));
-        Command stopKickAll = parallel(PollenTurret.StopKicking, NectarTurret.StopKicking, IntakeManager.stopTraransfer, instant(() -> {NectarGate.setPosition(NectarGateFirstPos);}));
 
         // B: spin up, or stop flywheel AND kicker
         ToggleSpinUp = conditional(() -> PollenTurret.IsShooting, StopShooting, spinUpAll);
