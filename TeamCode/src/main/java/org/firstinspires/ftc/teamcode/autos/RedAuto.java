@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-@Autonomous(name = "Red Auto", group = "Autonomous")
+@Autonomous(name = "Bad Red Auto", group = "Autonomous")
 public class RedAuto extends LinearOpMode {
 
     private Follower follower;

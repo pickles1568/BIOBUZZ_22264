@@ -61,7 +61,7 @@ public class SimpleBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        robot = new Robot(hardwareMap, true);
+        robot = new Robot(hardwareMap, false);
 
         Scheduler.reset();
         follower = Constants.create(hardwareMap);

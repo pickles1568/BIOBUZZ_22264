@@ -4,6 +4,7 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Scheduler;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.helpers.Button;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import org.firstinspires.ftc.teamcode.helpers.Button;
-
+@Disabled
 @TeleOp(name = "Demo TeleOp", group = "1 - Demos")
 public class Demo extends OpMode {
 

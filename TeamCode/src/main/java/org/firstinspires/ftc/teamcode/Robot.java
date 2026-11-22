@@ -90,7 +90,7 @@ public class Robot {
                         parallel(PollenTurret.WaitForSpeed, NectarTurret.WaitForSpeed),
                         waitMs((long) 5000)),      // moves on at speed, or after the timeout
                 parallel(kickAll),
-                waitMs(1500),                                  // time to feed the balls, tune this
+                waitMs(5000),                                  // time to feed the balls, tune this
                 StopShooting, stopKickAll
         );
 

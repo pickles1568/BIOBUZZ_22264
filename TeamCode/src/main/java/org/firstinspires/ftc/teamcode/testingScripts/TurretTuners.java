@@ -5,9 +5,10 @@ import org.firstinspires.ftc.teamcode.helpers.Button;
 
 import com.bylazar.panels.Panels;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+@Disabled
 @TeleOp(name = "Turret Tuner", group = "2 - Testing")
 public class TurretTuners extends LinearOpMode {
 

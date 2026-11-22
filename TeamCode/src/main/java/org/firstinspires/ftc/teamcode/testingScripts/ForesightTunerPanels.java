@@ -13,12 +13,13 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.math.Vector2D;
 import com.pedropathing.paths.Path;
 import com.pedropathing.revhub.localizers.PinpointLocalizer;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.helpers.Button;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
-
+@Disabled
 @TeleOp(name = "Foresight Tuner (Interactive)", group = "2 - Testing")
 public class ForesightTunerPanels extends LinearOpMode {
 
